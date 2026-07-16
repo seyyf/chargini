@@ -1,0 +1,28 @@
+{
+  "app": {
+    "name": "Chargini",
+    "tagline": "Rechargez votre voiture électrique chez l'habitant"
+  },
+  "nav": {
+    "explore": "Explorer",
+    "becomeHost": "Devenir hôte",
+    "dashboard": "Tableau de bord",
+    "login": "Connexion",
+    "logout": "Déconnexion"
+  },
+  "home": {
+    "heroTitle": "Trouvez une borne de recharge près de chez vous",
+    "heroSubtitle": "Des particuliers partagent leur borne. Réservez un créneau, rechargez, c'est tout.",
+    "ctaExplore": "Voir les bornes",
+    "ctaHost": "Proposer ma borne"
+  },
+  "auth": {
+    "title": "Connexion / Inscription",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "withGoogle": "Continuer avec Google",
+    "signedInAs": "Connecté en tant que {email}"
+  }
+}
