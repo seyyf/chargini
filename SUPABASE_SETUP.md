@@ -12,22 +12,27 @@ When finished, Claude will run the seed script, wire up auth, and verify — all
 3. Wait ~2 minutes for it to provision.
 
 ## 2. Copy your API keys
-1. In the project, go to **Project Settings** (gear icon) → **API**.
-2. Copy these three values:
+1. In the project, go to **Project Settings** (gear icon) → **API keys**.
+2. Copy these values (new-format keys):
    - **Project URL** (looks like `https://abcxyz.supabase.co`)
-   - **anon public** key (a long JWT)
-   - **service_role** key (a different long JWT — keep this secret)
+   - **Publishable key** (starts with `sb_publishable_…`) — safe for the browser
+   - **Secret key** (starts with `sb_secret_…`) — keep this private
 
 ## 3. Create `.env.local`
-Create a file at `depannage-ev/.env.local` (it is gitignored — never committed) with:
+Create a file at `depannage-ev/.env.local` (it is gitignored — never committed) with
+EXACTLY these variable names (the `NEXT_PUBLIC_` prefixes matter — Next.js only exposes
+prefixed vars to the browser, and both the URL and publishable key are used there):
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx
+SUPABASE_SECRET_KEY=sb_secret_xxx
 ```
 
-Replace the three values with what you copied. (`depannage-ev/.env.example` shows the same format.)
+Map your values: Supabase's `SUPABASE_URL` → `NEXT_PUBLIC_SUPABASE_URL`,
+`SUPABASE_PUBLISHABLE_KEY` → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+`SUPABASE_SECRET_KEY` → `SUPABASE_SECRET_KEY` (same). You don't need `SUPABASE_JWKS_URL`.
+(`depannage-ev/.env.example` shows the same format.)
 
 ## 4. Run the two SQL migrations
 1. In Supabase, open **SQL Editor** → **New query**.
