@@ -68,7 +68,9 @@ concerns (real payment settlement, legal identity verification) are deliberately
    profile snippet, reviews, availability.
 4. Pick a time slot from the host's availability.
 5. **Mock payment** step (realistic checkout UI, computes total, no real charge).
-6. Booking confirmation (`/bookings/[id]`), booking appears in both dashboards.
+6. Booking is created as **`pending`** and appears in both dashboards. The host
+   then **accepts** it (→ `confirmed`) or **declines** it (→ `cancelled`); the
+   driver sees the status update on `/bookings/[id]`.
 
 ### 4.3 Trust loop
 1. After a booking's end time passes (or host marks it completed), both parties
@@ -93,8 +95,10 @@ concerns (real payment settlement, legal identity verification) are deliberately
   **v1 ships French only**, but all UI strings live in message catalogs and the
   layout is direction-aware, so **Arabic + RTL is a clean phase-2 addition** (no
   refactor, just a new catalog + enabling the switcher + RTL styling pass).
-- **Payments:** mocked. A `MockCheckout` flow computes the total and records a
-  booking with a `paid (mock)` status; no payment provider is integrated.
+- **Payments:** mocked. A `MockCheckout` flow computes the total and creates the
+  booking in `pending` status (request-to-book). No real charge occurs, no
+  payment provider is integrated, and no separate paid status exists — status
+  stays within the enum in section 6.
 - **Deploy:** Vercel (app) + Supabase cloud (DB/auth/storage), both free tier.
 
 ## 6. Data model (Postgres via Supabase)
