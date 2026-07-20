@@ -51,11 +51,20 @@ async function main() {
   }
   const driverId = await ensureUser("driver@example.com", "Conducteur Démo");
 
-  // Mark hosts verified.
-  await supabase
-    .from("profiles")
-    .update({ is_verified: true })
-    .in("id", hostIds);
+  // Backfill profiles. The handle_new_user trigger only fires for users created
+  // after the migration ran, so upsert here to stay correct and re-runnable.
+  const { error: profileErr } = await supabase.from("profiles").upsert(
+    [
+      ...hostIds.map((id, i) => ({
+        id,
+        full_name: `Hôte ${i + 1}`,
+        is_verified: true,
+      })),
+      { id: driverId, full_name: "Conducteur Démo", is_verified: false },
+    ],
+    { onConflict: "id" },
+  );
+  if (profileErr) throw profileErr;
 
   // Wipe existing demo chargers to keep re-runs idempotent.
   await supabase.from("chargers").delete().in("host_id", hostIds);
