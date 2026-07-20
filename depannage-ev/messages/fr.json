@@ -23,6 +23,7 @@
     "signIn": "Se connecter",
     "signUp": "Créer un compte",
     "withGoogle": "Continuer avec Google",
-    "signedInAs": "Connecté en tant que {email}"
+    "signedInAs": "Connecté en tant que {email}",
+    "checkEmail": "Compte créé. Vérifiez votre e-mail pour confirmer votre inscription."
   }
 }
