@@ -10,6 +10,11 @@
 -- when you call `.select()` with no argument) will fail with "permission denied
 -- for table profiles" for anon/authenticated. Always name the columns you want
 -- when querying profiles from the browser.
+--
+-- PHASE 2 WARNING: `select('*')` / a bare `.select()` on `profiles` will fail
+-- with "permission denied for table profiles" for anon/authenticated — always
+-- name explicit columns. When host profile pages are built, consider a
+-- `profiles_public` view (security_invoker) instead of hand-listing columns.
 
 set search_path = public, extensions;
 

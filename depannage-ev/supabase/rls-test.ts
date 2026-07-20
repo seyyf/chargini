@@ -24,8 +24,10 @@ const DRIVER_EMAIL = "driver@example.com";
 const DRIVER_PASSWORD = "Password123!";
 
 let failures = 0;
+let passes = 0;
 
 function pass(name: string, detail: string) {
+  passes++;
   console.log(`PASS  ${name}\n        ${detail}`);
 }
 
@@ -295,17 +297,106 @@ async function main() {
     }
   }
 
+  // ---------------------------------------------------------------- 9
+  // Review bombing: with a legitimate COMPLETED booking, the driver must only be
+  // able to review its actual counterparty (the charger's host), never an
+  // unrelated third-party profile. Admin sets up a real completed booking so the
+  // driver is a genuine participant, isolating the reviewee_id constraint from
+  // the "booking must be completed" check exercised by 8.
+  {
+    // A host that is NOT this charger's host, to serve as the bomb target.
+    const { data: others } = await admin
+      .from("chargers")
+      .select("host_id")
+      .neq("host_id", charger.host_id)
+      .limit(1);
+    const thirdPartyId = others?.[0]?.host_id as string | undefined;
+
+    // Admin-create a completed booking for the driver on this charger. The
+    // no-overlap constraint only covers pending/confirmed, so 'completed' is
+    // free to sit on the same slot as the check-7 booking.
+    const cStart = new Date(start.getTime() + 10 * 3600_000);
+    const cEnd = new Date(cStart.getTime() + 3600_000);
+    const { data: completed, error: setupErr } = await admin
+      .from("bookings")
+      .insert({
+        charger_id: charger.id,
+        driver_id: driverId,
+        start_time: cStart.toISOString(),
+        end_time: cEnd.toISOString(),
+        status: "completed",
+        total_price: 1,
+      })
+      .select("id")
+      .single();
+
+    if (setupErr || !completed || !thirdPartyId) {
+      fail(
+        "9. review bombing is blocked",
+        `setup failed: ${setupErr?.message ?? "no completed booking or third-party host found"}`,
+      );
+    } else {
+      // 9a — bomb: review an unrelated third party. Must be blocked.
+      const { data: bomb, error: bombErr } = await driver
+        .from("reviews")
+        .insert({
+          booking_id: completed.id,
+          reviewer_id: driverId,
+          reviewee_id: thirdPartyId,
+          rating: 1,
+          comment: "RLS TEST - should not exist",
+        })
+        .select("id")
+        .maybeSingle();
+
+      check(
+        "9a. driver cannot review an unrelated third party",
+        bombErr !== null,
+        bombErr
+          ? `blocked: ${bombErr.message}`
+          : `INSERT SUCCEEDED — driver review-bombed host ${thirdPartyId}`,
+      );
+      if (!bombErr && bomb?.id) await admin.from("reviews").delete().eq("id", bomb.id);
+
+      // 9b — legitimate: review the actual counterparty. Must succeed.
+      const { data: legit, error: legitErr } = await driver
+        .from("reviews")
+        .insert({
+          booking_id: completed.id,
+          reviewer_id: driverId,
+          reviewee_id: charger.host_id,
+          rating: 5,
+          comment: "RLS TEST - should not exist",
+        })
+        .select("id, reviewee_id")
+        .maybeSingle();
+
+      check(
+        "9b. driver can review the booking's real counterparty",
+        legitErr === null && legit?.reviewee_id === charger.host_id,
+        legitErr
+          ? `unexpectedly blocked: ${legitErr.message}`
+          : `inserted review for reviewee_id=${legit?.reviewee_id} (host_id=${charger.host_id})`,
+      );
+      if (legit?.id) await admin.from("reviews").delete().eq("id", legit.id);
+    }
+
+    if (completed?.id) await admin.from("bookings").delete().eq("id", completed.id);
+  }
+
   // ---- cleanup --------------------------------------------------------------
   if (pendingBookingId) {
     await admin.from("bookings").delete().eq("id", pendingBookingId);
   }
   await admin.from("chargers").delete().eq("title", "RLS TEST - should not exist");
+  await admin.from("reviews").delete().eq("comment", "RLS TEST - should not exist");
   await driver.auth.signOut();
 
+  const total = passes + failures;
   console.log(
     failures === 0
-      ? "\nAll checks passed."
-      : `\n${failures} check(s) FAILED — apply supabase/migrations/0003_rls_hardening.sql.`,
+      ? `\nAll ${total} checks passed.`
+      : `\n${failures} of ${total} check(s) FAILED — apply supabase/migrations/0003_rls_hardening.sql.`,
   );
   process.exit(failures === 0 ? 0 : 1);
 }
