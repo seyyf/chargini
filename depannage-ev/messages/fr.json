@@ -40,5 +40,59 @@
     "title": "Page introuvable",
     "description": "Cette page n'existe pas ou n'est pas encore disponible.",
     "backHome": "Retour à l'accueil"
+  },
+  "explore": {
+    "title": "Bornes disponibles",
+    "resultsCount": "{count, plural, =0 {Aucune borne} one {# borne} other {# bornes}}",
+    "filters": {
+      "heading": "Filtres",
+      "connector": "Type de prise",
+      "minPower": "Puissance min. (kW)",
+      "maxPrice": "Prix max. (TND)",
+      "city": "Ville",
+      "allCities": "Toutes les villes",
+      "reset": "Réinitialiser",
+      "anyConnector": "Toutes les prises"
+    },
+    "empty": "Aucune borne ne correspond à vos critères.",
+    "viewDetails": "Voir la borne"
+  },
+  "charger": {
+    "perKwh": "par kWh",
+    "perHour": "par heure",
+    "specs": "Caractéristiques",
+    "connector": "Type de prise",
+    "power": "Puissance",
+    "price": "Prix",
+    "location": "Emplacement",
+    "host": "Hôte",
+    "verified": "Vérifié",
+    "memberSince": "Membre depuis {date}",
+    "reviews": "Avis",
+    "noReviews": "Pas encore d'avis.",
+    "ratingSummary": "{avg} ({count})",
+    "availability": "Disponibilités",
+    "noAvailability": "Aucune disponibilité renseignée.",
+    "book": "Réserver",
+    "bookRequiresAuth": "Connectez-vous pour réserver",
+    "bookingComingSoon": "La réservation arrive bientôt.",
+    "backToExplore": "Retour aux bornes",
+    "notFound": "Cette borne n'existe pas ou n'est plus disponible."
+  },
+  "days": {
+    "0": "Dimanche",
+    "1": "Lundi",
+    "2": "Mardi",
+    "3": "Mercredi",
+    "4": "Jeudi",
+    "5": "Vendredi",
+    "6": "Samedi"
+  },
+  "connectors": {
+    "type2": "Type 2",
+    "type1": "Type 1",
+    "ccs": "CCS",
+    "chademo": "CHAdeMO",
+    "schuko": "Prise domestique"
   }
 }
