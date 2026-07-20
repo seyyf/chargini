@@ -7,14 +7,29 @@ import { CONNECTOR_LABELS, formatPrice, formatPower } from "@/lib/chargers/forma
 
 interface ChargerCardProps {
   charger: Charger;
+  /** Currently selected charger id (synced with map). */
+  selectedId?: string | null;
+  /** Called when the user clicks the card to select/pan the map. */
+  onSelect?: (id: string) => void;
 }
 
-export function ChargerCard({ charger }: ChargerCardProps) {
+export function ChargerCard({ charger, selectedId, onSelect }: ChargerCardProps) {
   const t = useTranslations("explore");
   const photo = charger.photos[0];
+  const isSelected = selectedId != null && charger.id === selectedId;
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+    <article
+      className={[
+        "flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md",
+        isSelected
+          ? "border-emerald-500 ring-2 ring-emerald-500"
+          : "border-slate-200",
+      ].join(" ")}
+      onClick={() => onSelect?.(charger.id)}
+      style={onSelect ? { cursor: "pointer" } : undefined}
+      aria-current={isSelected ? "true" : undefined}
+    >
       {/* Photo or placeholder */}
       {photo ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -76,6 +91,7 @@ export function ChargerCard({ charger }: ChargerCardProps) {
           <Link
             href={`/chargers/${charger.id}`}
             className="block w-full rounded-lg bg-emerald-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-emerald-700"
+            onClick={(e) => e.stopPropagation()}
           >
             {t("viewDetails")}
           </Link>
