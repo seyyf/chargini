@@ -6,7 +6,7 @@ import { routing } from "./src/i18n/routing";
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
-  const response = intlMiddleware(request);
+  let response = intlMiddleware(request);
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,9 +17,19 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+          // Per Supabase's SSR cookie contract, refreshed cookies must be
+          // mirrored onto the request (so getAll() and downstream Server
+          // Components see the new token on THIS request) and onto the
+          // response (so the browser receives it). Mutating request.cookies
+          // and only then rebuilding the response ensures the intl
+          // middleware's response carries the updated request headers.
+          cookiesToSet.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
+          });
+          response = intlMiddleware(request);
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
         },
       },
     },

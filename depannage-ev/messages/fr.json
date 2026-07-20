@@ -24,6 +24,16 @@
     "signUp": "Créer un compte",
     "withGoogle": "Continuer avec Google",
     "signedInAs": "Connecté en tant que {email}",
-    "checkEmail": "Compte créé. Vérifiez votre e-mail pour confirmer votre inscription."
+    "checkEmail": "Compte créé. Vérifiez votre e-mail pour confirmer votre inscription.",
+    "callbackError": "La connexion a échoué. Veuillez réessayer.",
+    "errors": {
+      "invalidCredentials": "Adresse e-mail ou mot de passe incorrect.",
+      "userAlreadyExists": "Un compte existe déjà avec cette adresse e-mail.",
+      "emailNotConfirmed": "Veuillez confirmer votre e-mail avant de vous connecter.",
+      "weakPassword": "Le mot de passe est trop faible (6 caractères minimum).",
+      "emailInvalid": "Adresse e-mail invalide.",
+      "rateLimited": "Trop de tentatives. Veuillez patienter puis réessayer.",
+      "generic": "Une erreur est survenue. Veuillez réessayer."
+    }
   }
 }

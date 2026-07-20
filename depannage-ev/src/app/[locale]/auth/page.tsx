@@ -1,18 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { authErrorKey } from "@/lib/authErrors";
 
-export default function AuthPage() {
+export default function AuthPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const t = useTranslations("auth");
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
+  const { error: callbackError } = use(searchParams);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    callbackError ? t("callbackError") : null,
+  );
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +34,7 @@ export default function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(t(`errors.${authErrorKey(error)}`));
       return;
     }
     router.push("/");
@@ -43,7 +51,7 @@ export default function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(t(`errors.${authErrorKey(error)}`));
       return;
     }
     if (data.session) {
@@ -64,7 +72,7 @@ export default function AuthPage() {
       },
     });
     if (error) {
-      setError(error.message);
+      setError(t(`errors.${authErrorKey(error)}`));
     }
   }
 
