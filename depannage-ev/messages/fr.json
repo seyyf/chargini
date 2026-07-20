@@ -35,5 +35,10 @@
       "rateLimited": "Trop de tentatives. Veuillez patienter puis réessayer.",
       "generic": "Une erreur est survenue. Veuillez réessayer."
     }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "Cette page n'existe pas ou n'est pas encore disponible.",
+    "backHome": "Retour à l'accueil"
   }
 }
