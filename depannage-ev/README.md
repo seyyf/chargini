@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chargini — P2P EV Charging Marketplace (Tunisia)
 
-## Getting Started
+Peer-to-peer marketplace where people with home EV chargers rent them to drivers —
+filling the gap left by Tunisia's sparse public-charging network.
 
-First, run the development server:
+**Stack:** Next.js 16 (App Router) · TypeScript · Tailwind · Supabase (Postgres/Auth/Storage)
+· next-intl. French UI today; Arabic + RTL is a planned phase 2.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Setup
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. `npm install`
+2. Create a Supabase project, then copy `.env.example` to `.env.local` and fill in:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx
+   SUPABASE_SECRET_KEY=sb_secret_xxx
+   ```
+   These are Supabase's **new** API key names. The URL and publishable key need the
+   `NEXT_PUBLIC_` prefix because the browser client reads them; the secret key must
+   NOT be prefixed — it is server-only (seed script) and must never reach the browser.
+3. In the Supabase SQL Editor, run `supabase/migrations/0001_init.sql`, then
+   `supabase/migrations/0002_rls.sql` (order matters — tables first, then policies).
+4. `npm run seed` — loads 6 demo hosts and 18 chargers across Tunis, Ariana, Sfax,
+   Sousse, Nabeul and Bizerte, plus availability, bookings and reviews.
+5. `npm run dev` → http://localhost:3000/fr
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Dev server |
+| `npm test` | Unit + component tests (Vitest) |
+| `npm run build` | Production build (also type-checks) |
+| `npm run seed` | Load demo data (idempotent — safe to re-run) |
 
-## Learn More
+## Demo accounts
 
-To learn more about Next.js, take a look at the following resources:
+Created by the seed script, all with password `Password123!`:
+`host0@example.com` … `host5@example.com` (hosts), `driver@example.com` (driver).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Routing:** every page lives under `/[locale]`; middleware redirects `/` → `/fr`.
+- **Auth:** Supabase email/password + Google OAuth. Middleware refreshes the session
+  and mirrors cookies onto both request and response so Server Components see the
+  fresh token in the same render.
+- **Security:** Row-Level Security is enabled on all five tables. Verified enforcing:
+  anonymous users can read active chargers but cannot read bookings or insert chargers.
+  The OAuth callback validates its `next` parameter via `safeNextPath()` to prevent
+  open redirects (see `src/lib/safeRedirect.ts` and its tests).
+- **Pricing:** `src/lib/pricing.ts` computes booking totals for per-kWh and per-hour
+  chargers.
 
-## Deploy on Vercel
+## Known gaps (intentional — later phases)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `/explore`, `/host/new`, and `/dashboard` are linked in the header but **not built yet**;
+  they 404. They arrive in phases 2–4.
+- Google OAuth works only once a Google provider is configured in Supabase; until then
+  the button surfaces an error.
+- Arabic locale + RTL styling is phase 2. The i18n structure is already in place — adding
+  it means adding `"ar"` to `src/i18n/routing.ts` plus a `messages/ar.json` catalog.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Environment quirk
+
+`next dev` (Turbopack) does not execute middleware in some sandboxed environments, so the
+`/` → `/fr` redirect may not fire in dev there. It works correctly under
+`npm run build && npx next start`. Navigate directly to `/fr` in dev if affected.
+
+## Status
+
+**Phase 1 (Foundation) complete:** i18n, database schema + RLS, seed data, auth, app shell.
+Roadmap and specs live in `../docs/superpowers/`.
