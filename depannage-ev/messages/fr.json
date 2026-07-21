@@ -55,7 +55,8 @@
       "anyConnector": "Toutes les prises"
     },
     "empty": "Aucune borne ne correspond à vos critères.",
-    "viewDetails": "Voir la borne"
+    "viewDetails": "Voir la borne",
+    "card": { "connector": "Prise", "power": "Puissance", "price": "Prix" }
   },
   "charger": {
     "perKwh": "par kWh",

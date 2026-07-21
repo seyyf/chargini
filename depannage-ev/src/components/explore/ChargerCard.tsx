@@ -26,8 +26,7 @@ export function ChargerCard({ charger, selectedId, onSelect }: ChargerCardProps)
           ? "border-emerald-500 ring-2 ring-emerald-500"
           : "border-slate-200",
       ].join(" ")}
-      onClick={() => onSelect?.(charger.id)}
-      style={onSelect ? { cursor: "pointer" } : undefined}
+      onMouseEnter={() => onSelect?.(charger.id)}
       aria-current={isSelected ? "true" : undefined}
     >
       {/* Photo or placeholder */}
@@ -68,19 +67,19 @@ export function ChargerCard({ charger, selectedId, onSelect }: ChargerCardProps)
 
         <dl className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
           <div>
-            <dt className="text-slate-400">Prise</dt>
+            <dt className="text-slate-400">{t("card.connector")}</dt>
             <dd className="font-medium text-slate-700">
               {CONNECTOR_LABELS[charger.connector_type]}
             </dd>
           </div>
           <div>
-            <dt className="text-slate-400">Puissance</dt>
+            <dt className="text-slate-400">{t("card.power")}</dt>
             <dd className="font-medium text-slate-700">
               {formatPower(charger.power_kw)}
             </dd>
           </div>
           <div className="col-span-2">
-            <dt className="text-slate-400">Prix</dt>
+            <dt className="text-slate-400">{t("card.price")}</dt>
             <dd className="font-medium text-slate-700">
               {formatPrice(charger.price_amount, charger.price_unit)}
             </dd>
@@ -91,7 +90,6 @@ export function ChargerCard({ charger, selectedId, onSelect }: ChargerCardProps)
           <Link
             href={`/chargers/${charger.id}`}
             className="block w-full rounded-lg bg-emerald-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-emerald-700"
-            onClick={(e) => e.stopPropagation()}
           >
             {t("viewDetails")}
           </Link>
