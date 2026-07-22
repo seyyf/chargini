@@ -3,7 +3,9 @@ import { getTranslations } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getBookingDetail } from "@/lib/bookings/queries";
+import { getReviewByBookingAndReviewer } from "@/lib/reviews/queries";
 import { BookingActions } from "@/components/booking/BookingActions";
+import { ReviewForm } from "@/components/booking/ReviewForm";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -96,6 +98,13 @@ export default async function BookingDetailPage({
     CONNECTOR_LABELS[booking.charger.connector_type] ??
     booking.charger.connector_type;
 
+  // ── Review state (only relevant for completed bookings) ────────────────────
+
+  const existingReview =
+    status === "completed"
+      ? await getReviewByBookingAndReviewer(booking.id, user!.id)
+      : null;
+
   return (
     <section className="mx-auto max-w-2xl px-6 py-8">
       <h1 className="mb-6 text-2xl font-bold tracking-tight text-slate-900">
@@ -177,6 +186,32 @@ export default async function BookingDetailPage({
           status={status}
         />
       </div>
+
+      {/* Review section — only shown for completed bookings */}
+      {status === "completed" && (
+        <div className="mt-6">
+          {existingReview ? (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <p className="text-sm text-slate-500">
+                {t("review.alreadyReviewed")}
+              </p>
+              {/* Show the stars they gave */}
+              <div className="mt-1 flex gap-0.5" aria-label={`${existingReview.rating} étoiles`}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={`text-lg ${star <= existingReview.rating ? "text-amber-400" : "text-slate-300"}`}
+                  >
+                    {star <= existingReview.rating ? "★" : "☆"}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <ReviewForm bookingId={booking.id} />
+          )}
+        </div>
+      )}
 
       {/* Back link */}
       <div className="mt-8">
