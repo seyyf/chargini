@@ -159,6 +159,7 @@
     "newTitle": "Proposer votre borne",
     "editTitle": "Modifier la borne",
     "intro": "Renseignez les détails de votre borne pour la publier.",
+    "requiredNote": "Les champs marqués d'un * sont obligatoires.",
     "fields": {
       "title": "Titre",
       "description": "Description",
@@ -171,6 +172,8 @@
       "priceUnit": "Unité de prix",
       "perKwh": "par kWh",
       "perHour": "par heure",
+      "free": "Offrir l'électricité gratuitement",
+      "freeHint": "Les conducteurs pourront recharger sans rien payer.",
       "photos": "Photos",
       "availability": "Disponibilités"
     },

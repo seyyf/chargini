@@ -9,6 +9,8 @@ export interface ListingInput {
   powerKw: number | null;
   priceAmount: number | null;
   priceUnit: string;
+  /** When true the charger is offered free of charge; price is not required. */
+  isFree?: boolean;
   availability: Array<{
     day_of_week: number;
     start_time: string;
@@ -61,8 +63,8 @@ export function validateListing(input: ListingInput): ListingErrors {
     errors.powerKw = "host.errors.powerInvalid";
   }
 
-  // priceAmount: non-null, > 0
-  if (input.priceAmount === null || input.priceAmount <= 0) {
+  // priceAmount: non-null, > 0 — unless the charger is offered for free.
+  if (!input.isFree && (input.priceAmount === null || input.priceAmount <= 0)) {
     errors.priceAmount = "host.errors.priceInvalid";
   }
 

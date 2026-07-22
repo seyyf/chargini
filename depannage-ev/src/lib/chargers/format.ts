@@ -17,13 +17,16 @@ const priceFormatter = new Intl.NumberFormat("fr-FR", {
 const powerFormatter = new Intl.NumberFormat("fr-FR");
 
 /**
- * Formats a price for display in TND.
+ * Formats a price for display in TND. A zero amount means the charger is
+ * offered free of charge.
  *
  * @example
  * formatPrice(0.45, "kwh") // "0,450 TND / kWh"
  * formatPrice(5, "hour")   // "5,000 TND / h"
+ * formatPrice(0, "kwh")    // "Gratuit"
  */
 export function formatPrice(amount: number, unit: PriceUnit): string {
+  if (amount === 0) return "Gratuit";
   const suffix = unit === "kwh" ? " TND / kWh" : " TND / h";
   return `${priceFormatter.format(amount)}${suffix}`;
 }

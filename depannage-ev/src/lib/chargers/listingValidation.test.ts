@@ -197,6 +197,24 @@ describe("validateListing — priceAmount", () => {
     const errors = validateListing({ ...VALID_INPUT, priceAmount: 0.01 });
     expect(errors.priceAmount).toBeUndefined();
   });
+
+  it("accepts a zero priceAmount when the charger is free", () => {
+    const errors = validateListing({
+      ...VALID_INPUT,
+      isFree: true,
+      priceAmount: 0,
+    });
+    expect(errors.priceAmount).toBeUndefined();
+  });
+
+  it("accepts a null priceAmount when the charger is free", () => {
+    const errors = validateListing({
+      ...VALID_INPUT,
+      isFree: true,
+      priceAmount: null,
+    });
+    expect(errors.priceAmount).toBeUndefined();
+  });
 });
 
 describe("validateListing — priceUnit", () => {
