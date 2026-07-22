@@ -6,7 +6,8 @@ import { CONNECTOR_LABELS, formatPrice, formatPower } from "@/lib/chargers/forma
 import { HostCard } from "@/components/charger/HostCard";
 import { AvailabilityTable } from "@/components/charger/AvailabilityTable";
 import { ReviewList } from "@/components/charger/ReviewList";
-import { BookingCta } from "@/components/charger/BookingCta";
+import { BookingWidget } from "@/components/booking/BookingWidget";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function ChargerDetailPage({
   params,
@@ -20,6 +21,14 @@ export default async function ChargerDetailPage({
   if (!charger) {
     notFound();
   }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const viewer: "guest" | "host" | "driver" =
+    !user ? "guest" : user.id === charger.host_id ? "host" : "driver";
 
   const t = await getTranslations("charger");
 
@@ -147,7 +156,17 @@ export default async function ChargerDetailPage({
         {/* Sidebar (1/3) */}
         <div className="mt-10 space-y-4 md:mt-0">
           <HostCard host={charger.host} />
-          <BookingCta />
+          <BookingWidget
+            charger={{
+              id: charger.id,
+              title: charger.title,
+              priceAmount: charger.price_amount,
+              priceUnit: charger.price_unit,
+              powerKw: charger.power_kw,
+            }}
+            availability={charger.availability}
+            viewer={viewer}
+          />
         </div>
       </div>
     </section>
