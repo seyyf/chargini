@@ -95,5 +95,51 @@
     "ccs": "CCS",
     "chademo": "CHAdeMO",
     "schuko": "Prise domestique"
+  },
+  "host": {
+    "newTitle": "Proposer votre borne",
+    "editTitle": "Modifier la borne",
+    "intro": "Renseignez les détails de votre borne pour la publier.",
+    "fields": {
+      "title": "Titre",
+      "description": "Description",
+      "address": "Adresse",
+      "city": "Ville",
+      "location": "Emplacement sur la carte",
+      "connector": "Type de prise",
+      "power": "Puissance (kW)",
+      "price": "Prix",
+      "priceUnit": "Unité de prix",
+      "perKwh": "par kWh",
+      "perHour": "par heure",
+      "photos": "Photos",
+      "availability": "Disponibilités"
+    },
+    "locationHint": "Cliquez sur la carte pour placer votre borne.",
+    "addPhotos": "Ajouter des photos",
+    "addAvailability": "Ajouter un créneau",
+    "day": "Jour",
+    "startTime": "Début",
+    "endTime": "Fin",
+    "remove": "Retirer",
+    "submitNew": "Publier la borne",
+    "submitEdit": "Enregistrer",
+    "submitting": "Publication…",
+    "successNew": "Votre borne est publiée !",
+    "loginRequired": "Connectez-vous pour proposer une borne.",
+    "notOwner": "Vous ne pouvez modifier que vos propres bornes.",
+    "errors": {
+      "titleRequired": "Le titre est obligatoire.",
+      "addressRequired": "L'adresse est obligatoire.",
+      "locationRequired": "Placez votre borne sur la carte.",
+      "cityRequired": "La ville est obligatoire.",
+      "connectorRequired": "Choisissez un type de prise.",
+      "powerInvalid": "Indiquez une puissance valide (en kW).",
+      "priceInvalid": "Indiquez un prix valide.",
+      "priceUnitRequired": "Choisissez une unité de prix.",
+      "availabilityInvalid": "Un créneau est invalide (l'heure de fin doit suivre le début).",
+      "uploadFailed": "Le téléversement des photos a échoué.",
+      "generic": "Une erreur est survenue. Veuillez réessayer."
+    }
   }
 }
