@@ -208,5 +208,30 @@
     "view": "Voir",
     "active": "Active",
     "inactive": "Inactive"
+  },
+  "review": {
+    "leaveTitle": "Laisser un avis",
+    "yourRating": "Votre note",
+    "yourComment": "Votre commentaire",
+    "submit": "Publier l'avis",
+    "submitting": "Publication…",
+    "alreadyReviewed": "Vous avez déjà laissé un avis pour cette réservation.",
+    "onlyCompleted": "Vous pourrez laisser un avis une fois la réservation terminée.",
+    "success": "Merci pour votre avis !",
+    "errors": {
+      "ratingRequired": "Choisissez une note entre 1 et 5.",
+      "commentTooLong": "Le commentaire est trop long (1000 caractères max).",
+      "notAllowed": "Vous ne pouvez pas laisser cet avis.",
+      "generic": "Une erreur est survenue. Veuillez réessayer."
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "memberSince": "Membre depuis {date}",
+    "verified": "Vérifié",
+    "reviews": "Avis reçus",
+    "noReviews": "Aucun avis pour le moment.",
+    "ratingSummary": "{avg} · {count} avis",
+    "notFound": "Ce profil n'existe pas."
   }
 }
