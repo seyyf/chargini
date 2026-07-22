@@ -53,12 +53,26 @@ Created by the seed script, all with password `Password123!`:
 
 ## Known gaps (intentional — later phases)
 
-- `/explore`, `/host/new`, and `/dashboard` are linked in the header but **not built yet**;
-  they 404. They arrive in phases 2–4.
-- Google OAuth works only once a Google provider is configured in Supabase; until then
-  the button surfaces an error.
-- Arabic locale + RTL styling is phase 2. The i18n structure is already in place — adding
-  it means adding `"ar"` to `src/i18n/routing.ts` plus a `messages/ar.json` catalog.
+- Google OAuth needs provider config in Supabase; until then the button surfaces an error.
+- Arabic/RTL is phase 2 (future). The i18n structure is already in place — adding it means
+  adding `"ar"` to `src/i18n/routing.ts` plus a `messages/ar.json` catalog.
+- Payments are mocked (no real payment gateway integrated).
+- No Playwright E2E yet (verified via manual/agent-browser QA).
+- No live Vercel deploy yet.
+
+## Routes
+
+| Path | Description |
+|---|---|
+| `/` | Landing page |
+| `/explore` | Explore chargers (map + list + filters) |
+| `/chargers/[id]` | Charger detail |
+| `/host/new` | Listing wizard (host) |
+| `/host/[id]/edit` | Edit listing (host) |
+| `/dashboard` | Role-aware dashboard (host or driver) |
+| `/bookings/[id]` | Booking detail |
+| `/profile/[id]` | Public profile |
+| `/auth` | Sign in / sign up |
 
 ## Environment quirk
 
@@ -68,5 +82,6 @@ Created by the seed script, all with password `Password123!`:
 
 ## Status
 
-**Phase 1 (Foundation) complete:** i18n, database schema + RLS, seed data, auth, app shell.
+Phases 1–5 complete: foundation (i18n, schema+RLS, auth), discovery (explore map+list+filters, charger detail), hosting (listing wizard with map pin, photo upload, availability, edit), booking (slot picker, mock checkout, role-aware dashboard, accept/decline/complete), and trust (reviews, rating rollup, public profiles). Phase 6 (polish): landing page + seed photos.
+
 Roadmap and specs live in `../docs/superpowers/`.

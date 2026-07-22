@@ -6,3 +6,6 @@ node_modules/
 
 # Local QA screenshots (agent-browser)
 .screenshots/
+
+# Local Claude Code agent state
+.claude/

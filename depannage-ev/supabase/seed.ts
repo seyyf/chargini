@@ -14,6 +14,18 @@ const supabase = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } },
 );
 
+const PHOTOS = [
+  "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1601288496920-b6154fe3626a?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1617704548623-340376564e68?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1591768793355-74d04bb6608f?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1554744512-d6c603f27c54?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1200&q=80&auto=format&fit=crop",
+];
+
 const CITIES: Array<{ city: string; lat: number; lng: number }> = [
   { city: "Tunis", lat: 36.8065, lng: 10.1815 },
   { city: "Ariana", lat: 36.8625, lng: 10.1956 },
@@ -89,7 +101,7 @@ async function main() {
         power_kw: [3.7, 7, 11, 22, 50][i % 5],
         price_amount: priceUnit === "kwh" ? 0.35 + (i % 3) * 0.1 : 4 + (i % 4),
         price_unit: priceUnit,
-        photos: [],
+        photos: [PHOTOS[i % PHOTOS.length], PHOTOS[(i + 3) % PHOTOS.length]],
         is_active: true,
       })
       .select("id")
