@@ -19,20 +19,20 @@ export async function IncomingBookingRow({ booking }: IncomingBookingRowProps) {
   const slot = `${slotFmt.format(new Date(booking.start_time))} – ${new Intl.DateTimeFormat("fr-FR", { timeStyle: "short" }).format(new Date(booking.end_time))}`;
 
   return (
-    <div className="rounded-lg border border-slate-100 bg-white px-4 py-3 shadow-sm space-y-2">
+    <div className="rounded-2xl border border-brand-100 bg-white px-4 py-3 shadow-sm space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Driver name + charger link */}
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-ink-soft">
             {booking.driver.full_name ?? "—"}
           </p>
           <Link
             href={`/bookings/${booking.id}`}
-            className="truncate text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
+            className="truncate text-sm font-semibold text-brand-700 hover:text-brand-800 hover:underline"
           >
             {booking.charger.title}
           </Link>
-          <p className="text-xs text-slate-500">{slot}</p>
+          <p className="text-xs text-ink-soft">{slot}</p>
         </div>
 
         {/* Status badge */}

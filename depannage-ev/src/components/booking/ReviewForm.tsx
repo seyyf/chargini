@@ -63,8 +63,8 @@ export function ReviewForm({ bookingId }: ReviewFormProps) {
 
   if (success) {
     return (
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
-        <p className="text-sm font-medium text-emerald-700">{t("success")}</p>
+      <div className="rounded-2xl border border-charge-500/20 bg-charge-500/10 px-5 py-4">
+        <p className="text-sm font-medium text-charge-600">{t("success")}</p>
       </div>
     );
   }
@@ -72,15 +72,15 @@ export function ReviewForm({ bookingId }: ReviewFormProps) {
   // ── Form ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-5 py-5 shadow-sm">
-      <h2 className="mb-4 text-base font-semibold text-slate-900">
+    <div className="rounded-2xl border border-brand-100 bg-white px-5 py-5 shadow-sm">
+      <h2 className="mb-4 font-display text-base font-semibold text-ink">
         {t("leaveTitle")}
       </h2>
 
       <form onSubmit={handleSubmit} noValidate>
         {/* Star rating */}
         <div className="mb-4">
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">
+          <label className="mb-1.5 block text-sm font-medium text-ink">
             {t("yourRating")}
           </label>
           <div
@@ -99,9 +99,9 @@ export function ReviewForm({ bookingId }: ReviewFormProps) {
                   aria-pressed={star <= rating}
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHovered(star)}
-                  className="text-2xl leading-none transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1 rounded"
+                  className="cursor-pointer text-2xl leading-none transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1 rounded"
                 >
-                  <span className={filled ? "text-amber-400" : "text-slate-300"}>
+                  <span className={filled ? "text-amber-400" : "text-ink-faint"}>
                     {filled ? "★" : "☆"}
                   </span>
                 </button>
@@ -114,7 +114,7 @@ export function ReviewForm({ bookingId }: ReviewFormProps) {
         <div className="mb-4">
           <label
             htmlFor={`review-comment-${bookingId}`}
-            className="mb-1.5 block text-sm font-medium text-slate-700"
+            className="mb-1.5 block text-sm font-medium text-ink"
           >
             {t("yourComment")}
           </label>
@@ -125,9 +125,9 @@ export function ReviewForm({ bookingId }: ReviewFormProps) {
             maxLength={1000}
             rows={4}
             disabled={isPending}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:bg-slate-50 disabled:text-slate-500"
+            className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink placeholder-ink-faint shadow-sm focus:border-brand-400 focus:bg-white focus:outline-none disabled:bg-surface disabled:text-ink-faint"
           />
-          <p className="mt-1 text-right text-xs text-slate-400">
+          <p className="mt-1 text-right text-xs text-ink-faint">
             {comment.length}/1000
           </p>
         </div>
@@ -143,7 +143,7 @@ export function ReviewForm({ bookingId }: ReviewFormProps) {
         <button
           type="submit"
           disabled={isPending || rating < 1}
-          className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer rounded-xl bg-ink px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? t("submitting") : t("submit")}
         </button>

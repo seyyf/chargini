@@ -14,11 +14,11 @@ type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled";
 function statusBadgeClasses(status: BookingStatus): string {
   switch (status) {
     case "pending":
-      return "bg-amber-100 text-amber-800 ring-amber-200";
+      return "bg-amber-100 text-amber-700 ring-amber-200";
     case "confirmed":
-      return "bg-emerald-100 text-emerald-800 ring-emerald-200";
+      return "bg-charge-500/10 text-charge-600 ring-charge-500/20";
     case "completed":
-      return "bg-slate-100 text-slate-700 ring-slate-200";
+      return "bg-charge-500/10 text-charge-600 ring-charge-500/20";
     case "cancelled":
       return "bg-red-100 text-red-700 ring-red-200";
   }
@@ -107,25 +107,25 @@ export default async function BookingDetailPage({
 
   return (
     <section className="mx-auto max-w-2xl px-6 py-8">
-      <h1 className="mb-6 text-2xl font-bold tracking-tight text-slate-900">
+      <h1 className="mb-6 font-display text-2xl font-bold tracking-tight text-ink">
         {t("bookingPage.title")}
       </h1>
 
       {/* Summary card */}
-      <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="divide-y divide-brand-100 rounded-2xl border border-brand-100 bg-white shadow-sm">
         {/* Charger */}
         <div className="flex items-start justify-between px-5 py-4">
-          <span className="text-sm font-medium text-slate-500">
+          <span className="text-sm font-medium text-ink-soft">
             {t("bookingPage.charger")}
           </span>
-          <span className="text-right text-sm font-semibold text-slate-900">
+          <span className="text-right text-sm font-semibold text-ink">
             <Link
               href={`/chargers/${booking.charger.id}`}
-              className="text-emerald-600 hover:text-emerald-700 hover:underline"
+              className="text-brand-700 hover:text-brand-800 hover:underline"
             >
               {booking.charger.title}
             </Link>
-            <span className="block text-xs font-normal text-slate-500">
+            <span className="block text-xs font-normal text-ink-soft">
               {connectorLabel} · {booking.charger.city}
             </span>
           </span>
@@ -133,32 +133,32 @@ export default async function BookingDetailPage({
 
         {/* When */}
         <div className="flex items-start justify-between px-5 py-4">
-          <span className="text-sm font-medium text-slate-500">
+          <span className="text-sm font-medium text-ink-soft">
             {t("bookingPage.when")}
           </span>
-          <span className="text-right text-sm font-semibold text-slate-900">
+          <span className="text-right text-sm font-semibold text-ink">
             {whenLabel}
           </span>
         </div>
 
         {/* Total */}
         <div className="flex items-start justify-between px-5 py-4">
-          <span className="text-sm font-medium text-slate-500">
+          <span className="text-sm font-medium text-ink-soft">
             {t("bookingPage.total")}
           </span>
-          <span className="text-sm font-semibold text-slate-900">
+          <span className="text-sm font-semibold text-ink">
             {priceLabel}
           </span>
         </div>
 
         {/* Other party */}
         <div className="flex items-start justify-between px-5 py-4">
-          <span className="text-sm font-medium text-slate-500">
+          <span className="text-sm font-medium text-ink-soft">
             {role === "driver"
               ? t("bookingPage.host")
               : t("bookingPage.driver")}
           </span>
-          <span className="text-sm font-semibold text-slate-900">
+          <span className="text-sm font-semibold text-ink">
             {role === "driver"
               ? (booking.host.full_name ?? "—")
               : (booking.driver.full_name ?? "—")}
@@ -167,7 +167,7 @@ export default async function BookingDetailPage({
 
         {/* Status */}
         <div className="flex items-start justify-between px-5 py-4">
-          <span className="text-sm font-medium text-slate-500">
+          <span className="text-sm font-medium text-ink-soft">
             {t("bookingPage.statusLabel")}
           </span>
           <span
@@ -191,8 +191,8 @@ export default async function BookingDetailPage({
       {status === "completed" && (
         <div className="mt-6">
           {existingReview ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
-              <p className="text-sm text-slate-500">
+            <div className="rounded-2xl border border-brand-100 bg-brand-50/40 px-5 py-4">
+              <p className="text-sm text-ink-soft">
                 {t("review.alreadyReviewed")}
               </p>
               {/* Show the stars they gave */}
@@ -200,7 +200,7 @@ export default async function BookingDetailPage({
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span
                     key={star}
-                    className={`text-lg ${star <= existingReview.rating ? "text-amber-400" : "text-slate-300"}`}
+                    className={`text-lg ${star <= existingReview.rating ? "text-amber-400" : "text-ink-faint"}`}
                   >
                     {star <= existingReview.rating ? "★" : "☆"}
                   </span>
@@ -217,7 +217,7 @@ export default async function BookingDetailPage({
       <div className="mt-8">
         <Link
           href="/dashboard"
-          className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+          className="text-sm font-medium text-brand-700 hover:text-brand-800 hover:underline"
         >
           ← {t("bookingPage.backToDashboard")}
         </Link>

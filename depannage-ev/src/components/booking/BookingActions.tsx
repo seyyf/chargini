@@ -55,14 +55,14 @@ export function BookingActions({ bookingId, role, status }: BookingActionsProps)
         <button
           onClick={handleAction(acceptBooking)}
           disabled={isPending}
-          className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
+          className="cursor-pointer rounded-xl bg-ink px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("bookingPage.accept")}
         </button>
         <button
           onClick={handleAction(declineBooking)}
           disabled={isPending}
-          className="rounded-lg border border-red-300 px-5 py-2 text-sm font-semibold text-red-600 shadow-sm hover:bg-red-50 disabled:opacity-50"
+          className="cursor-pointer rounded-xl border border-red-300 px-5 py-2 text-sm font-semibold text-red-600 shadow-sm transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("bookingPage.decline")}
         </button>
@@ -76,7 +76,7 @@ export function BookingActions({ bookingId, role, status }: BookingActionsProps)
         <button
           onClick={handleAction(completeBooking)}
           disabled={isPending}
-          className="rounded-lg bg-slate-700 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 disabled:opacity-50"
+          className="cursor-pointer rounded-xl bg-ink px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("bookingPage.complete")}
         </button>
@@ -90,7 +90,7 @@ export function BookingActions({ bookingId, role, status }: BookingActionsProps)
         <button
           onClick={handleAction(cancelBooking)}
           disabled={isPending}
-          className="rounded-lg border border-red-300 px-5 py-2 text-sm font-semibold text-red-600 shadow-sm hover:bg-red-50 disabled:opacity-50"
+          className="cursor-pointer rounded-xl border border-red-300 px-5 py-2 text-sm font-semibold text-red-600 shadow-sm transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("bookingPage.cancel")}
         </button>

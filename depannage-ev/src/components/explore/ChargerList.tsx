@@ -15,7 +15,7 @@ export function ChargerList({ chargers, selectedId }: ChargerListProps) {
 
   if (chargers.length === 0) {
     return (
-      <p className="py-16 text-center text-slate-500">{t("empty")}</p>
+      <p className="py-16 text-center text-ink-soft">{t("empty")}</p>
     );
   }
 

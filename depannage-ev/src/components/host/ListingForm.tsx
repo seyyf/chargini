@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { validateListing, type ListingErrors } from "@/lib/chargers/listingValidation";
 import { createCharger, updateCharger } from "@/app/actions/chargers";
@@ -45,7 +46,7 @@ const PRICE_UNITS = ["kwh", "hour"] as const;
 
 function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-700">
+    <label htmlFor={htmlFor} className="block text-sm font-medium text-ink-soft">
       {children}
     </label>
   );
@@ -167,7 +168,7 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
     <form onSubmit={handleSubmit} noValidate className="space-y-6">
       {/* Server-level error */}
       {serverError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {serverError}
         </div>
       )}
@@ -181,7 +182,7 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           maxLength={120}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("title")} />
       </div>
@@ -194,7 +195,7 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("description")} />
       </div>
@@ -207,7 +208,7 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("address")} />
       </div>
@@ -220,7 +221,7 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           type="text"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("city")} />
       </div>
@@ -228,7 +229,7 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
       {/* Map location picker */}
       <div>
         <FieldLabel htmlFor="location-map">{t("host.fields.location")}</FieldLabel>
-        <p className="mb-2 text-xs text-slate-500">{t("host.locationHint")}</p>
+        <p className="mb-2 text-xs text-ink-faint">{t("host.locationHint")}</p>
         <div id="location-map">
           <LocationPicker
             value={location}
@@ -249,7 +250,7 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           id="connectorType"
           value={connectorType}
           onChange={(e) => setConnectorType(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         >
           {CONNECTOR_TYPES.map((ct) => (
             <option key={ct} value={ct}>
@@ -271,7 +272,7 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           step={0.1}
           value={powerKw}
           onChange={(e) => setPowerKw(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("powerKw")} />
       </div>
@@ -287,13 +288,13 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
             step={0.01}
             value={priceAmount}
             onChange={(e) => setPriceAmount(e.target.value)}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
           />
           <select
             id="priceUnit"
             value={priceUnit}
             onChange={(e) => setPriceUnit(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
           >
             {PRICE_UNITS.map((u) => (
               <option key={u} value={u}>
@@ -328,8 +329,9 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-60"
         >
+          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           {isPending
             ? t("host.submitting")
             : mode === "new"

@@ -11,21 +11,21 @@ export async function ListingRow({ charger }: ListingRowProps) {
   const t = await getTranslations();
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-100 bg-white px-4 py-3 shadow-sm">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-100 bg-white px-4 py-3 shadow-sm">
       {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-slate-900">
+        <p className="truncate text-sm font-semibold text-ink">
           {charger.title}
         </p>
-        <p className="text-xs text-slate-500">{charger.city}</p>
+        <p className="text-xs text-ink-soft">{charger.city}</p>
       </div>
 
       {/* Active badge */}
       <span
         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
           charger.is_active
-            ? "bg-emerald-100 text-emerald-800 ring-emerald-200"
-            : "bg-slate-100 text-slate-600 ring-slate-200"
+            ? "bg-charge-500/10 text-charge-600 ring-charge-500/30"
+            : "bg-brand-50 text-ink-faint ring-brand-100"
         }`}
       >
         {charger.is_active ? t("dashboard.active") : t("dashboard.inactive")}
@@ -35,13 +35,13 @@ export async function ListingRow({ charger }: ListingRowProps) {
       <div className="flex flex-wrap items-center gap-2">
         <Link
           href={`/chargers/${charger.id}`}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+          className="cursor-pointer rounded-xl border border-brand-200 px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-brand-50"
         >
           {t("dashboard.view")}
         </Link>
         <Link
           href={`/host/${charger.id}/edit`}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+          className="cursor-pointer rounded-xl border border-brand-200 px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-brand-50"
         >
           {t("dashboard.edit")}
         </Link>

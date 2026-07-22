@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
+import { Plus, X } from "lucide-react";
 
 const MAX_PHOTOS = 5;
 
@@ -50,8 +51,8 @@ export function PhotoUploader({ files, onChange }: PhotoUploaderProps) {
   return (
     <div className="space-y-3">
       {files.length < MAX_PHOTOS && (
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-emerald-400 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100">
-          <span>+</span>
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-50 px-4 py-2 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-100">
+          <Plus className="h-4 w-4" />
           <span>{t("host.addPhotos")}</span>
           <input
             type="file"
@@ -66,7 +67,7 @@ export function PhotoUploader({ files, onChange }: PhotoUploaderProps) {
       {files.length > 0 && (
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
           {files.map((file, i) => (
-            <div key={i} className="relative aspect-square overflow-hidden rounded-lg border border-slate-200">
+            <div key={i} className="relative aspect-square overflow-hidden rounded-xl border border-brand-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={getPreviewUrl(file)}
@@ -77,9 +78,9 @@ export function PhotoUploader({ files, onChange }: PhotoUploaderProps) {
                 type="button"
                 onClick={() => removeFile(i)}
                 aria-label={t("host.remove")}
-                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-xs text-white hover:bg-black/80"
+                className="absolute right-1 top-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80"
               >
-                ×
+                <X className="h-3 w-3" />
               </button>
             </div>
           ))}

@@ -109,33 +109,33 @@ function CheckoutModal({
       }}
     >
       {/* Modal card */}
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-        <h2 className="mb-1 text-lg font-bold text-slate-900">
+      <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-white p-6 shadow-2xl">
+        <h2 className="mb-1 font-display text-lg font-bold text-ink">
           {t("checkoutTitle")}
         </h2>
 
         {/* Booking summary */}
-        <p className="mb-5 text-sm text-slate-600">
+        <p className="mb-5 text-sm text-ink-soft">
           {charger.title} &mdash; {date} {startTime}&ndash;{endTime} &mdash;{" "}
-          <span className="font-semibold text-slate-900">{formattedTotal}</span>
+          <span className="font-semibold text-ink">{formattedTotal}</span>
         </p>
 
         {/* Fake card inputs */}
         <div className="space-y-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-ink-soft">
               {t("cardName")}
             </label>
             <input
               type="text"
               autoComplete="cc-name"
               placeholder="Jean Dupont"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-ink-soft">
               {t("cardNumber")}
             </label>
             <input
@@ -143,13 +143,13 @@ function CheckoutModal({
               autoComplete="cc-number"
               placeholder="4242 4242 4242 4242"
               maxLength={19}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">
+              <label className="mb-1 block text-xs font-medium text-ink-soft">
                 {t("expiry")}
               </label>
               <input
@@ -157,11 +157,11 @@ function CheckoutModal({
                 autoComplete="cc-exp"
                 placeholder="MM/AA"
                 maxLength={5}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">
+              <label className="mb-1 block text-xs font-medium text-ink-soft">
                 {t("cvc")}
               </label>
               <input
@@ -169,14 +169,14 @@ function CheckoutModal({
                 autoComplete="cc-csc"
                 placeholder="123"
                 maxLength={4}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
               />
             </div>
           </div>
         </div>
 
         {/* Mock notice */}
-        <p className="mt-3 text-xs text-slate-400">{t("mockNotice")}</p>
+        <p className="mt-3 text-xs text-ink-faint">{t("mockNotice")}</p>
 
         {/* Error */}
         {error && (
@@ -191,7 +191,7 @@ function CheckoutModal({
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-60"
+            className="flex-1 cursor-pointer rounded-xl border border-brand-200 px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {t("cancel")}
           </button>
@@ -200,7 +200,7 @@ function CheckoutModal({
             type="button"
             onClick={handlePay}
             disabled={isPending}
-            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex-1 cursor-pointer rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isPending
               ? t("processing")
@@ -230,13 +230,13 @@ export function BookingWidget({
   // ── Guest ──
   if (viewer === "guest") {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 font-display text-base font-semibold text-ink">
           {t("widgetTitle")}
         </h2>
         <Link
           href="/auth"
-          className="block w-full rounded-lg bg-emerald-600 px-5 py-3 text-center font-semibold text-white transition-colors hover:bg-emerald-700"
+          className="block w-full cursor-pointer rounded-xl bg-ink px-5 py-3 text-center font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25"
         >
           {t("loginToBook")}
         </Link>
@@ -247,11 +247,11 @@ export function BookingWidget({
   // ── Host ──
   if (viewer === "host") {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-2 text-base font-semibold text-slate-900">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-2 font-display text-base font-semibold text-ink">
           {t("widgetTitle")}
         </h2>
-        <p className="text-sm text-slate-500">{t("ownCharger")}</p>
+        <p className="text-sm text-ink-soft">{t("ownCharger")}</p>
       </div>
     );
   }
@@ -260,11 +260,11 @@ export function BookingWidget({
 
   if (!hasAnyAvailability(availability)) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-2 text-base font-semibold text-slate-900">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-2 font-display text-base font-semibold text-ink">
           {t("widgetTitle")}
         </h2>
-        <p className="text-sm text-slate-500">{t("noAvailability")}</p>
+        <p className="text-sm text-ink-soft">{t("noAvailability")}</p>
       </div>
     );
   }
@@ -298,15 +298,15 @@ export function BookingWidget({
 
   return (
     <>
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 font-display text-base font-semibold text-ink">
           {t("widgetTitle")}
         </h2>
 
         <div className="space-y-3">
           {/* Date */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-ink-soft">
               {t("date")}
             </label>
             <input
@@ -314,33 +314,33 @@ export function BookingWidget({
               value={date}
               min={todayISO()}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
             />
           </div>
 
           {/* Start time */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-ink-soft">
               {t("start")}
             </label>
             <input
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
             />
           </div>
 
           {/* End time */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-ink-soft">
               {t("end")}
             </label>
             <input
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
             />
           </div>
         </div>
@@ -354,9 +354,9 @@ export function BookingWidget({
 
         {/* Total */}
         {valid && total !== null && (
-          <p className="mt-3 text-sm text-slate-700">
+          <p className="mt-3 text-sm text-ink-soft">
             <span className="font-medium">{t("total")} :</span>{" "}
-            <span className="font-bold text-emerald-700">{formattedTotal}</span>
+            <span className="font-bold text-brand-700">{formattedTotal}</span>
           </p>
         )}
 
@@ -365,7 +365,7 @@ export function BookingWidget({
           type="button"
           disabled={!valid}
           onClick={() => setShowModal(true)}
-          className="mt-4 w-full rounded-lg bg-emerald-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-4 w-full cursor-pointer rounded-xl bg-ink px-5 py-3 font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("reserve")}
         </button>

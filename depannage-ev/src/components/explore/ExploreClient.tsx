@@ -54,7 +54,7 @@ export function ExploreClient({ chargers }: ExploreClientProps) {
         />
 
         {/* Results count header */}
-        <p className="mb-4 text-sm font-medium text-slate-600">
+        <p className="mb-4 text-sm font-medium text-ink-soft">
           {t("resultsCount", { count: filtered.length })}
         </p>
 

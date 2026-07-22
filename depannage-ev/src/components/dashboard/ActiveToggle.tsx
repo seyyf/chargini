@@ -28,8 +28,8 @@ export function ActiveToggle({ chargerId, active }: ActiveToggleProps) {
       disabled={isPending}
       className={
         active
-          ? "rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
-          : "rounded-lg border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+          ? "cursor-pointer rounded-xl border border-brand-200 px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-50"
+          : "cursor-pointer rounded-xl border border-charge-500/30 px-3 py-1.5 text-xs font-medium text-charge-600 transition-colors hover:bg-charge-500/10 disabled:cursor-not-allowed disabled:opacity-50"
       }
     >
       {active ? t("dashboard.deactivate") : t("dashboard.activate")}

@@ -11,7 +11,7 @@ function StarRating({ rating }: { rating: number }) {
   return (
     <span aria-label={`${rating} étoiles sur 5`}>
       {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={i < rating ? "text-amber-400" : "text-slate-300"}>
+        <span key={i} className={i < rating ? "text-amber-400" : "text-brand-100"}>
           ★
         </span>
       ))}
@@ -24,12 +24,12 @@ export async function ReviewList({ reviews }: ReviewListProps) {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold text-slate-900">
+      <h2 className="mb-4 font-display text-xl font-semibold text-ink">
         {t("reviews")}
       </h2>
 
       {reviews.length === 0 ? (
-        <p className="text-sm text-slate-500">{t("noReviews")}</p>
+        <p className="text-sm text-ink-soft">{t("noReviews")}</p>
       ) : (
         <ul className="space-y-4">
           {reviews.map((review) => {
@@ -39,7 +39,7 @@ export async function ReviewList({ reviews }: ReviewListProps) {
             return (
               <li
                 key={review.id}
-                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm"
               >
                 <div className="flex items-start gap-3">
                   {review.reviewer.avatar_url ? (
@@ -49,17 +49,17 @@ export async function ReviewList({ reviews }: ReviewListProps) {
                       className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-ink-soft">
                       {initial}
                     </div>
                   )}
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-ink">
                         {review.reviewer.full_name || "Utilisateur"}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-ink-faint">
                         {dateFormatter.format(new Date(review.created_at))}
                       </p>
                     </div>
@@ -69,7 +69,7 @@ export async function ReviewList({ reviews }: ReviewListProps) {
                     </div>
 
                     {review.comment && (
-                      <p className="mt-2 text-sm text-slate-600">
+                      <p className="mt-2 text-sm text-ink-soft">
                         {review.comment}
                       </p>
                     )}

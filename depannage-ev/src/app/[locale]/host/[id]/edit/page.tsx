@@ -35,13 +35,13 @@ export default async function HostEditPage({
   if (detail.host_id !== user!.id) {
     return (
       <section className="mx-auto max-w-3xl px-6 py-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
           {t("editTitle")}
         </h1>
-        <p className="mt-4 text-slate-600">{t("notOwner")}</p>
+        <p className="mt-4 text-ink-soft">{t("notOwner")}</p>
         <Link
           href="/explore"
-          className="mt-6 inline-block rounded-lg bg-emerald-600 px-5 py-2.5 font-medium text-white hover:bg-emerald-700"
+          className="mt-6 inline-block rounded-xl bg-ink px-5 py-2.5 font-medium text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25"
         >
           {tNav("explore")}
         </Link>
@@ -70,7 +70,7 @@ export default async function HostEditPage({
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-8">
-      <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+      <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
         {t("editTitle")}
       </h1>
       <div className="mt-8">

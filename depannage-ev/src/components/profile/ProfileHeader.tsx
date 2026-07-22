@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { ShieldCheck, Star } from "lucide-react";
 import type { PublicProfile } from "@/lib/profiles/queries";
 
 type ProfileHeaderProps = {
@@ -16,7 +17,7 @@ export async function ProfileHeader({ profile }: ProfileHeaderProps) {
   }).format(new Date(profile.created_at));
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
       <div className="flex items-start gap-4">
         {/* Avatar */}
         {profile.avatar_url ? (
@@ -26,31 +27,20 @@ export async function ProfileHeader({ profile }: ProfileHeaderProps) {
             className="h-16 w-16 flex-shrink-0 rounded-full object-cover"
           />
         ) : (
-          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-700">
+          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-2xl font-bold text-brand-700">
             {initial}
           </div>
         )}
 
         {/* Name + badges */}
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="font-display text-2xl font-bold text-ink">
             {profile.full_name || "Utilisateur"}
           </h1>
 
           {profile.is_verified && (
-            <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
-              <svg
-                className="h-3.5 w-3.5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                  clipRule="evenodd"
-                />
-              </svg>
+            <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-charge-500/10 px-2.5 py-0.5 text-xs font-medium text-charge-600">
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
               {t("verified")}
             </span>
           )}
@@ -59,8 +49,8 @@ export async function ProfileHeader({ profile }: ProfileHeaderProps) {
 
       {/* Rating summary */}
       {profile.rating_count > 0 && (
-        <p className="mt-4 flex items-center gap-1 text-sm text-slate-600">
-          <span className="text-amber-400 text-base">★</span>
+        <p className="mt-4 flex items-center gap-1 text-sm text-ink-soft">
+          <Star className="h-4 w-4 fill-amber-400 text-amber-400" aria-hidden="true" />
           {t("ratingSummary", {
             avg: profile.rating_avg.toFixed(1),
             count: profile.rating_count,
@@ -69,7 +59,7 @@ export async function ProfileHeader({ profile }: ProfileHeaderProps) {
       )}
 
       {/* Member since */}
-      <p className="mt-2 text-xs text-slate-400">
+      <p className="mt-2 text-xs text-ink-faint">
         {t("memberSince", { date: memberSinceDate })}
       </p>
     </div>

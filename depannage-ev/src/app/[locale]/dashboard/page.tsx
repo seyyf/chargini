@@ -64,7 +64,7 @@ export default async function DashboardPage({
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-8 space-y-12">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+      <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
         {t("dashboard.title")}
       </h1>
 
@@ -73,23 +73,23 @@ export default async function DashboardPage({
         <div className="space-y-8">
           {/* Section header */}
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-semibold text-slate-800">
+            <h2 className="font-display text-lg font-semibold text-ink">
               {t("dashboard.hostSection")}
             </h2>
             <Link
               href="/host/new"
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+              className="cursor-pointer rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25"
             >
               {t("dashboard.addListing")}
             </Link>
           </div>
 
           {/* Earnings */}
-          <div className="rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+          <div className="rounded-2xl border border-brand-100 bg-white px-5 py-4 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">
               {t("dashboard.earnings")}
             </p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">
+            <p className="mt-1 text-2xl font-bold text-ink">
               {earningsLabel}
             </p>
           </div>
@@ -105,7 +105,7 @@ export default async function DashboardPage({
 
           {/* Incoming bookings */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-faint">
               {t("dashboard.incoming")}
             </h3>
             {hostBookings.length > 0 ? (
@@ -115,7 +115,7 @@ export default async function DashboardPage({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500">{t("dashboard.noIncoming")}</p>
+              <p className="text-sm text-ink-soft">{t("dashboard.noIncoming")}</p>
             )}
           </div>
         </div>
@@ -123,13 +123,13 @@ export default async function DashboardPage({
 
       {/* ── DRIVER section ────────────────────────────────────────────────── */}
       <div className="space-y-6">
-        <h2 className="text-lg font-semibold text-slate-800">
+        <h2 className="font-display text-lg font-semibold text-ink">
           {t("dashboard.driverSection")}
         </h2>
 
         {/* Upcoming */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-faint">
             {t("dashboard.upcoming")}
           </h3>
           {upcomingBookings.length > 0 ? (
@@ -139,13 +139,13 @@ export default async function DashboardPage({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500">{t("dashboard.noBookings")}</p>
+            <p className="text-sm text-ink-soft">{t("dashboard.noBookings")}</p>
           )}
         </div>
 
         {/* Past */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-faint">
             {t("dashboard.past")}
           </h3>
           {pastBookings.length > 0 ? (
@@ -155,7 +155,7 @@ export default async function DashboardPage({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500">{t("dashboard.noBookings")}</p>
+            <p className="text-sm text-ink-soft">{t("dashboard.noBookings")}</p>
           )}
         </div>
       </div>

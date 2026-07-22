@@ -15,16 +15,16 @@ export async function AvailabilityTable({ availability }: AvailabilityTableProps
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-semibold text-slate-900">
+      <h2 className="mb-4 font-display text-xl font-semibold text-ink">
         {t("charger.availability")}
       </h2>
 
       {availability.length === 0 ? (
-        <p className="text-sm text-slate-500">{t("charger.noAvailability")}</p>
+        <p className="text-sm text-ink-soft">{t("charger.noAvailability")}</p>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-slate-200">
+        <div className="overflow-hidden rounded-2xl border border-brand-100">
           <table className="w-full text-sm">
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-brand-100">
               {(() => {
                 // Group rules by day_of_week (0–6), preserving order
                 const byDay = new Map<number, AvailabilityRule[]>();
@@ -34,11 +34,11 @@ export async function AvailabilityTable({ availability }: AvailabilityTableProps
                 }
 
                 return Array.from(byDay.entries()).map(([day, rules]) => (
-                  <tr key={day} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-medium text-slate-700 w-32">
+                  <tr key={day} className="hover:bg-brand-50">
+                    <td className="px-4 py-3 font-medium text-ink-soft w-32">
                       {t(`days.${day}` as Parameters<typeof t>[0])}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-ink-soft">
                       {rules
                         .map(
                           (r) =>

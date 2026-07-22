@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
-// ── Emerald pin (matches ChargerMap) ─────────────────────────────────────────
+// ── Brand pin (matches ChargerMap) ────────────────────────────────────────────
 
 function makePin(color: string, size: number): L.DivIcon {
   const half = size / 2;
@@ -21,7 +21,7 @@ function makePin(color: string, size: number): L.DivIcon {
   });
 }
 
-const PIN = makePin("#10b981", 28); // emerald-500
+const PIN = makePin("#0891b2", 28); // brand-600
 
 // ── Click-handler child ───────────────────────────────────────────────────────
 
@@ -85,7 +85,7 @@ export function LocationPicker({ value, onChange, onCity }: LocationPickerProps)
   }, []);
 
   return (
-    <div className="h-80 w-full overflow-hidden rounded-lg border border-slate-200">
+    <div className="h-80 w-full overflow-hidden rounded-2xl border border-brand-100">
       <MapContainer
         center={[34.0, 9.5]}
         zoom={6}

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { ChevronLeft, Zap } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getChargerDetail } from "@/lib/chargers/queries";
 import { CONNECTOR_LABELS, formatPrice, formatPower } from "@/lib/chargers/format";
@@ -39,20 +40,9 @@ export default async function ChargerDetailPage({
       {/* Back link */}
       <Link
         href="/explore"
-        className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700"
+        className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:text-brand-800"
       >
-        <svg
-          className="h-4 w-4"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            fillRule="evenodd"
-            d="M11.78 5.22a.75.75 0 010 1.06L8.06 10l3.72 3.72a.75.75 0 11-1.06 1.06l-4.25-4.25a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 0z"
-            clipRule="evenodd"
-          />
-        </svg>
+        <ChevronLeft className="h-4 w-4" aria-hidden="true" />
         {t("backToExplore")}
       </Link>
 
@@ -65,21 +55,8 @@ export default async function ChargerDetailPage({
             className="aspect-video w-full rounded-xl object-cover shadow-sm"
           />
         ) : (
-          <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-slate-100 shadow-sm">
-            <svg
-              className="h-20 w-20 text-emerald-500"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
-              />
-            </svg>
+          <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-brand-50 shadow-sm">
+            <Zap className="h-20 w-20 text-brand-500" aria-hidden="true" />
           </div>
         )}
 
@@ -100,10 +77,10 @@ export default async function ChargerDetailPage({
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
           {charger.title}
         </h1>
-        <p className="mt-1 text-slate-500">
+        <p className="mt-1 text-ink-soft">
           {charger.city}
           {charger.address ? ` — ${charger.address}` : ""}
         </p>
@@ -115,31 +92,31 @@ export default async function ChargerDetailPage({
         <div className="space-y-10 md:col-span-2">
           {/* Specs block */}
           <div>
-            <h2 className="mb-4 text-xl font-semibold text-slate-900">
+            <h2 className="mb-4 font-display text-xl font-semibold text-ink">
               {t("specs")}
             </h2>
-            <dl className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-sm">
+            <dl className="divide-y divide-brand-100 rounded-2xl border border-brand-100 bg-white shadow-sm">
               <div className="flex items-start justify-between px-5 py-3.5">
-                <dt className="text-sm font-medium text-slate-500">{t("connector")}</dt>
-                <dd className="text-sm font-semibold text-slate-900">
+                <dt className="text-sm font-medium text-ink-soft">{t("connector")}</dt>
+                <dd className="text-sm font-semibold text-ink">
                   {CONNECTOR_LABELS[charger.connector_type]}
                 </dd>
               </div>
               <div className="flex items-start justify-between px-5 py-3.5">
-                <dt className="text-sm font-medium text-slate-500">{t("power")}</dt>
-                <dd className="text-sm font-semibold text-slate-900">
+                <dt className="text-sm font-medium text-ink-soft">{t("power")}</dt>
+                <dd className="text-sm font-semibold text-ink">
                   {formatPower(charger.power_kw)}
                 </dd>
               </div>
               <div className="flex items-start justify-between px-5 py-3.5">
-                <dt className="text-sm font-medium text-slate-500">{t("price")}</dt>
-                <dd className="text-sm font-semibold text-slate-900">
+                <dt className="text-sm font-medium text-ink-soft">{t("price")}</dt>
+                <dd className="text-sm font-semibold text-ink">
                   {formatPrice(charger.price_amount, charger.price_unit)}
                 </dd>
               </div>
               <div className="flex items-start justify-between px-5 py-3.5">
-                <dt className="text-sm font-medium text-slate-500">{t("location")}</dt>
-                <dd className="text-right text-sm font-semibold text-slate-900">
+                <dt className="text-sm font-medium text-ink-soft">{t("location")}</dt>
+                <dd className="text-right text-sm font-semibold text-ink">
                   {charger.address}, {charger.city}
                 </dd>
               </div>

@@ -17,7 +17,7 @@ export default async function ExplorePage({
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-8">
-      <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+      <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
         {t("title")}
       </h1>
       <ExploreClient chargers={chargers} />

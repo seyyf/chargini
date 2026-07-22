@@ -24,8 +24,8 @@ function makePin(color: string, size: number): L.DivIcon {
   });
 }
 
-const PIN_NORMAL = makePin("#10b981", 22); // emerald-500
-const PIN_SELECTED = makePin("#059669", 32); // emerald-600, larger
+const PIN_NORMAL = makePin("#0891b2", 22); // brand-600
+const PIN_SELECTED = makePin("#06b6d4", 32); // brand-500, larger
 
 // ── Map controller: pans to selectedId ───────────────────────────────────────
 
@@ -61,7 +61,7 @@ export interface ChargerMapProps {
 export function ChargerMap({ chargers, selectedId, onSelect }: ChargerMapProps) {
   return (
     <div
-      className="mb-4 h-[420px] w-full overflow-hidden rounded-xl border border-slate-200"
+      className="mb-4 h-[420px] w-full overflow-hidden rounded-2xl border border-brand-100"
       aria-label="Carte des bornes"
     >
       <MapContainer
@@ -88,13 +88,13 @@ export function ChargerMap({ chargers, selectedId, onSelect }: ChargerMapProps) 
           >
             <Popup>
               <div className="min-w-[160px] space-y-1 text-sm">
-                <p className="font-semibold text-slate-900">{charger.title}</p>
-                <p className="text-slate-600">
+                <p className="font-semibold text-ink">{charger.title}</p>
+                <p className="text-ink-soft">
                   {formatPrice(charger.price_amount, charger.price_unit)}
                 </p>
                 <Link
                   href={`/chargers/${charger.id}`}
-                  className="mt-1 inline-block rounded bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-700"
+                  className="mt-1 inline-block rounded bg-ink px-3 py-1 text-xs font-medium text-white hover:bg-brand-700"
                   onClick={(e) => e.stopPropagation()}
                 >
                   Voir la borne
