@@ -61,7 +61,6 @@ export function ExploreClient({ chargers }: ExploreClientProps) {
         <ChargerList
           chargers={filtered}
           selectedId={selectedId}
-          onSelect={setSelectedId}
         />
       </div>
     </div>
