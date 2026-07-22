@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { Globe } from "lucide-react";
 import { routing } from "@/i18n/routing";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
@@ -17,22 +18,26 @@ export function LanguageSwitcher() {
       <button
         type="button"
         disabled
-        className="rounded px-2 py-1 text-sm font-medium text-slate-500"
+        aria-label="Langue : Français"
+        className="inline-flex items-center gap-1 rounded-lg border border-brand-100 bg-white/60 px-2.5 py-1.5 text-xs font-semibold text-brand-700"
       >
+        <Globe className="h-3.5 w-3.5" />
         {LABELS[locale] ?? locale.toUpperCase()}
       </button>
     );
   }
 
   return (
-    <div className="flex gap-1">
+    <div className="inline-flex items-center gap-0.5 rounded-lg border border-brand-100 bg-white/60 p-0.5">
       {routing.locales.map((l) => (
         <button
           key={l}
           type="button"
           onClick={() => router.replace(pathname, { locale: l })}
-          className={`rounded px-2 py-1 text-sm font-medium ${
-            l === locale ? "bg-slate-900 text-white" : "text-slate-600"
+          className={`cursor-pointer rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+            l === locale
+              ? "bg-ink text-white"
+              : "text-ink-soft hover:text-brand-700"
           }`}
         >
           {LABELS[l] ?? l.toUpperCase()}

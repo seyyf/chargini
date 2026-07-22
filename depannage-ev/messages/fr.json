@@ -11,10 +11,26 @@
     "logout": "Déconnexion"
   },
   "home": {
+    "badge": "Recharge entre particuliers · Tunisie",
     "heroTitle": "Trouvez une borne de recharge près de chez vous",
+    "heroA": "Rechargez votre voiture électrique",
+    "heroB": "partout en Tunisie",
     "heroSubtitle": "Des particuliers partagent leur borne. Réservez un créneau, rechargez, c'est tout.",
     "ctaExplore": "Voir les bornes",
     "ctaHost": "Proposer ma borne",
+    "trustNote": "Sans engagement · Paiement à la réservation",
+    "stats": {
+      "chargersLabel": "Bornes actives",
+      "citiesLabel": "Villes couvertes",
+      "hostsLabel": "Hôtes vérifiés",
+      "ratingLabel": "Note moyenne"
+    },
+    "citiesTitle": "Déjà disponible dans",
+    "hostCta": {
+      "title": "Vous avez une borne chez vous ?",
+      "subtitle": "Rentabilisez-la quand vous ne l'utilisez pas. Vous fixez le prix et vos disponibilités — nous nous occupons du reste.",
+      "button": "Devenir hôte"
+    },
     "how": {
       "title": "Comment ça marche",
       "step1Title": "Trouvez une borne",
@@ -39,8 +55,22 @@
       "tagline": "La recharge entre particuliers, en Tunisie."
     }
   },
+  "footer": {
+    "tagline": "La recharge entre particuliers, partout en Tunisie.",
+    "product": "Produit",
+    "resources": "Ressources",
+    "explore": "Explorer les bornes",
+    "becomeHost": "Devenir hôte",
+    "about": "À propos",
+    "contact": "Contact",
+    "legal": "Mentions légales",
+    "rights": "Tous droits réservés.",
+    "madeIn": "Conçu en Tunisie"
+  },
   "auth": {
     "title": "Connexion / Inscription",
+    "brandLine": "Rejoignez la communauté de la recharge en Tunisie.",
+    "or": "ou",
     "email": "Adresse e-mail",
     "password": "Mot de passe",
     "signIn": "Se connecter",
