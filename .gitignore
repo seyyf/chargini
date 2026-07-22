@@ -3,3 +3,6 @@ node_modules/
 .env*
 !.env.example
 .DS_Store
+
+# Local QA screenshots (agent-browser)
+.screenshots/
