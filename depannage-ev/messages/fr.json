@@ -14,7 +14,30 @@
     "heroTitle": "Trouvez une borne de recharge près de chez vous",
     "heroSubtitle": "Des particuliers partagent leur borne. Réservez un créneau, rechargez, c'est tout.",
     "ctaExplore": "Voir les bornes",
-    "ctaHost": "Proposer ma borne"
+    "ctaHost": "Proposer ma borne",
+    "how": {
+      "title": "Comment ça marche",
+      "step1Title": "Trouvez une borne",
+      "step1Body": "Parcourez la carte et filtrez par ville, type de prise ou puissance pour trouver la borne idéale.",
+      "step2Title": "Réservez un créneau",
+      "step2Body": "Choisissez un créneau disponible et confirmez votre réservation en quelques secondes.",
+      "step3Title": "Rechargez & évaluez",
+      "step3Body": "Branchez-vous, rechargez votre voiture et laissez un avis pour aider la communauté."
+    },
+    "featured": "Bornes en vedette",
+    "seeAll": "Voir toutes les bornes",
+    "why": {
+      "title": "Pourquoi Chargini",
+      "verifiedTitle": "Hôtes vérifiés",
+      "verifiedBody": "Chaque hôte est contrôlé avant publication pour garantir votre tranquillité d'esprit.",
+      "easyTitle": "Paiement simple",
+      "easyBody": "Réglez en ligne en toute sécurité, sans surprise ni cash.",
+      "reviewsTitle": "Avis transparents",
+      "reviewsBody": "Les conducteurs partagent leurs expériences pour vous aider à faire le bon choix."
+    },
+    "footer": {
+      "tagline": "La recharge entre particuliers, en Tunisie."
+    }
   },
   "auth": {
     "title": "Connexion / Inscription",
