@@ -21,9 +21,16 @@ interface FiltersProps {
   chargers: Charger[];
   filters: ChargerFilters;
   onChange: (f: ChargerFilters) => void;
+  /** When true, drop the outer card + heading (used inside the filter drawer). */
+  embedded?: boolean;
 }
 
-export function Filters({ chargers, filters, onChange }: FiltersProps) {
+export function Filters({
+  chargers,
+  filters,
+  onChange,
+  embedded = false,
+}: FiltersProps) {
   const t = useTranslations("explore.filters");
 
   function toggleConnector(type: ConnectorType) {
@@ -57,10 +64,18 @@ export function Filters({ chargers, filters, onChange }: FiltersProps) {
   const cities = cityOptions(chargers);
 
   return (
-    <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 font-display text-base font-semibold text-ink">
-        {t("heading")}
-      </h2>
+    <div
+      className={
+        embedded
+          ? ""
+          : "rounded-2xl border border-brand-100 bg-white p-5 shadow-sm"
+      }
+    >
+      {!embedded && (
+        <h2 className="mb-4 font-display text-base font-semibold text-ink">
+          {t("heading")}
+        </h2>
+      )}
 
       {/* Connector type */}
       <fieldset className="mb-5">

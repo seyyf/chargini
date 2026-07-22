@@ -2,11 +2,9 @@
 
 import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
-import { Link } from "@/i18n/navigation";
 import type { Charger } from "@/types/database";
-import { formatPrice } from "@/lib/chargers/format";
 
 // ── Custom div icons (no external images needed) ──────────────────────────────
 
@@ -18,25 +16,39 @@ function makePin(color: string, size: number): L.DivIcon {
     iconAnchor: [half, tipY],
     popupAnchor: [0, -tipY],
     html: `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${tipY}" viewBox="0 0 ${size} ${tipY}" aria-hidden="true">
-  <circle cx="${half}" cy="${half}" r="${half}" fill="${color}" stroke="white" stroke-width="2"/>
-  <line x1="${half}" y1="${size}" x2="${half}" y2="${tipY}" stroke="${color}" stroke-width="2"/>
+  <circle cx="${half}" cy="${half}" r="${half}" fill="${color}" stroke="white" stroke-width="2.5"/>
+  <line x1="${half}" y1="${size}" x2="${half}" y2="${tipY}" stroke="${color}" stroke-width="2.5"/>
 </svg>`,
   });
 }
 
 const PIN_NORMAL = makePin("#0891b2", 22); // brand-600
-const PIN_SELECTED = makePin("#06b6d4", 32); // brand-500, larger
+const PIN_SELECTED = makePin("#06b6d4", 34); // brand-500, larger
 
-// ── Map controller: pans to selectedId ───────────────────────────────────────
+// ── Map controller: pans to selectedId + fits bounds + fixes hidden sizing ────
 
 interface MapControllerProps {
   selectedId: string | null;
   chargers: Charger[];
+  active: boolean;
 }
 
-function MapController({ selectedId, chargers }: MapControllerProps) {
+function MapController({ selectedId, chargers, active }: MapControllerProps) {
   const map = useMap();
 
+  // Leaflet renders grey tiles if its container was display:none at init.
+  // Invalidate size whenever the map becomes active (mobile toggle) and on resize.
+  useEffect(() => {
+    const fix = () => map.invalidateSize();
+    const t = setTimeout(fix, 60);
+    window.addEventListener("resize", fix);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("resize", fix);
+    };
+  }, [map, active]);
+
+  // Pan to the selected charger.
   useEffect(() => {
     if (!selectedId) return;
     const charger = chargers.find((c) => c.id === selectedId);
@@ -56,26 +68,36 @@ export interface ChargerMapProps {
   chargers: Charger[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  /** Whether the map is currently visible (used to fix Leaflet sizing). */
+  active?: boolean;
+  /** Extra classes for the map container (height is controlled by the parent). */
+  className?: string;
 }
 
-export function ChargerMap({ chargers, selectedId, onSelect }: ChargerMapProps) {
+export function ChargerMap({
+  chargers,
+  selectedId,
+  onSelect,
+  active = true,
+  className = "",
+}: ChargerMapProps) {
   return (
     <div
-      className="mb-4 h-[420px] w-full overflow-hidden rounded-2xl border border-brand-100"
+      className={`h-full w-full overflow-hidden ${className}`}
       aria-label="Carte des bornes"
     >
       <MapContainer
         center={[34.0, 9.5]}
         zoom={6}
+        scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
-        // Suppress SSR errors — file is only loaded via ssr:false
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
 
-        <MapController selectedId={selectedId} chargers={chargers} />
+        <MapController selectedId={selectedId} chargers={chargers} active={active} />
 
         {chargers.map((charger) => (
           <Marker
@@ -85,23 +107,7 @@ export function ChargerMap({ chargers, selectedId, onSelect }: ChargerMapProps) 
             eventHandlers={{
               click: () => onSelect(charger.id),
             }}
-          >
-            <Popup>
-              <div className="min-w-[160px] space-y-1 text-sm">
-                <p className="font-semibold text-ink">{charger.title}</p>
-                <p className="text-ink-soft">
-                  {formatPrice(charger.price_amount, charger.price_unit)}
-                </p>
-                <Link
-                  href={`/chargers/${charger.id}`}
-                  className="mt-1 inline-block rounded bg-ink px-3 py-1 text-xs font-medium text-white hover:bg-brand-700"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Voir la borne
-                </Link>
-              </div>
-            </Popup>
-          </Marker>
+          />
         ))}
       </MapContainer>
     </div>

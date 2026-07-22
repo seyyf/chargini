@@ -96,7 +96,11 @@
   },
   "explore": {
     "title": "Bornes disponibles",
+    "subtitle": "Trouvez une borne près de vous et réservez en quelques secondes.",
     "resultsCount": "{count, plural, =0 {Aucune borne} one {# borne} other {# bornes}}",
+    "showMap": "Carte",
+    "showList": "Liste",
+    "openFilters": "Filtres",
     "filters": {
       "heading": "Filtres",
       "connector": "Type de prise",
@@ -105,9 +109,11 @@
       "city": "Ville",
       "allCities": "Toutes les villes",
       "reset": "Réinitialiser",
+      "apply": "Afficher les résultats",
       "anyConnector": "Toutes les prises"
     },
     "empty": "Aucune borne ne correspond à vos critères.",
+    "emptyHint": "Essayez d'élargir vos filtres.",
     "viewDetails": "Voir la borne",
     "card": { "connector": "Prise", "power": "Puissance", "price": "Prix" }
   },
