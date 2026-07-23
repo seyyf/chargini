@@ -18,15 +18,15 @@ export async function BookingRow({ booking }: BookingRowProps) {
   const slot = `${slotFmt.format(new Date(booking.start_time))} – ${new Intl.DateTimeFormat("fr-FR", { timeStyle: "short" }).format(new Date(booking.end_time))}`;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-100 bg-white px-4 py-3 shadow-sm">
-      {/* Charger link + slot */}
+    <Link
+      href={`/bookings/${booking.id}`}
+      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-100 bg-white px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md"
+    >
+      {/* Charger + slot */}
       <div className="min-w-0 flex-1">
-        <Link
-          href={`/bookings/${booking.id}`}
-          className="truncate text-sm font-semibold text-brand-700 hover:text-brand-800 hover:underline"
-        >
+        <p className="truncate text-sm font-semibold text-ink">
           {booking.charger.title}
-        </Link>
+        </p>
         <p className="text-xs text-ink-soft">{slot}</p>
       </div>
 
@@ -36,6 +36,6 @@ export async function BookingRow({ booking }: BookingRowProps) {
       >
         {t(`booking.status.${booking.status}` as Parameters<typeof t>[0])}
       </span>
-    </div>
+    </Link>
   );
 }

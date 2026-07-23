@@ -20,18 +20,18 @@ export async function IncomingBookingRow({ booking }: IncomingBookingRowProps) {
 
   return (
     <div className="rounded-2xl border border-brand-100 bg-white px-4 py-3 shadow-sm space-y-2">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Driver name + charger link */}
+      {/* Whole info block is clickable (the action buttons below stay separate) */}
+      <Link
+        href={`/bookings/${booking.id}`}
+        className="-mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl px-1 py-1 transition-colors hover:bg-brand-50"
+      >
         <div className="min-w-0 flex-1">
           <p className="text-xs text-ink-soft">
             {booking.driver.full_name ?? "—"}
           </p>
-          <Link
-            href={`/bookings/${booking.id}`}
-            className="truncate text-sm font-semibold text-brand-700 hover:text-brand-800 hover:underline"
-          >
+          <p className="truncate text-sm font-semibold text-ink">
             {booking.charger.title}
-          </Link>
+          </p>
           <p className="text-xs text-ink-soft">{slot}</p>
         </div>
 
@@ -41,7 +41,7 @@ export async function IncomingBookingRow({ booking }: IncomingBookingRowProps) {
         >
           {t(`booking.status.${booking.status}` as Parameters<typeof t>[0])}
         </span>
-      </div>
+      </Link>
 
       {/* Inline Accept / Decline for pending bookings */}
       {booking.status === "pending" && (
