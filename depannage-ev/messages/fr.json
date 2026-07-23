@@ -94,6 +94,23 @@
     "description": "Cette page n'existe pas ou n'est pas encore disponible.",
     "backHome": "Retour à l'accueil"
   },
+  "notifications": {
+    "aria": "Notifications",
+    "title": "Notifications",
+    "empty": "Aucune notification.",
+    "types": {
+      "booking_requested": "Nouvelle demande de réservation",
+      "booking_confirmed": "Votre réservation a été acceptée",
+      "booking_cancelled": "Votre réservation a été annulée",
+      "booking_completed": "Réservation terminée"
+    },
+    "time": {
+      "now": "à l'instant",
+      "minutes": "il y a {n} min",
+      "hours": "il y a {n} h",
+      "days": "il y a {n} j"
+    }
+  },
   "explore": {
     "title": "Bornes disponibles",
     "subtitle": "Trouvez une borne près de vous et réservez en quelques secondes.",
@@ -216,6 +233,12 @@
     "loginToBook": "Connectez-vous pour réserver",
     "ownCharger": "Vous ne pouvez pas réserver votre propre borne.",
     "reserve": "Réserver",
+    "confirmTitle": "Confirmer la réservation",
+    "confirmReserve": "Envoyer la demande",
+    "toPay": "À payer sur place",
+    "free": "Gratuit",
+    "handPayment": "Le paiement se règle en main propre auprès de l'hôte, à la borne. Aucun paiement en ligne.",
+    "handPaymentShort": "Paiement en main propre auprès de l'hôte.",
     "noAvailability": "Cette borne n'a pas encore de disponibilités.",
     "checkoutTitle": "Paiement (simulation)",
     "cardName": "Nom sur la carte",

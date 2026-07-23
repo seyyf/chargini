@@ -7,6 +7,7 @@ import { Menu, X, LogOut, LayoutDashboard, Zap } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { Logo } from "./Logo";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { NotificationBell } from "./notifications/NotificationBell";
 import { signOutAction } from "@/app/actions/auth";
 
 export function HeaderNav({ isAuthed }: { isAuthed: boolean }) {
@@ -62,6 +63,7 @@ export function HeaderNav({ isAuthed }: { isAuthed: boolean }) {
 
         {/* Desktop right cluster */}
         <div className="hidden items-center gap-2 md:flex">
+          {isAuthed && <NotificationBell />}
           <LanguageSwitcher />
           {isAuthed ? (
             <>
@@ -101,16 +103,19 @@ export function HeaderNav({ isAuthed }: { isAuthed: boolean }) {
           )}
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-expanded={open}
-          className="inline-flex cursor-pointer items-center justify-center rounded-lg p-2 text-ink transition-colors hover:bg-brand-50 md:hidden"
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* Mobile: bell + menu toggle */}
+        <div className="flex items-center gap-1 md:hidden">
+          {isAuthed && <NotificationBell />}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={open}
+            className="inline-flex cursor-pointer items-center justify-center rounded-lg p-2 text-ink transition-colors hover:bg-brand-50"
+          >
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile menu */}
