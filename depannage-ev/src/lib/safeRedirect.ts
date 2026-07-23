@@ -1,4 +1,4 @@
-const DEFAULT_NEXT_PATH = "/fr";
+const DEFAULT_NEXT_PATH = "/";
 
 /**
  * Validates that a caller-supplied "next" redirect target is a site-relative

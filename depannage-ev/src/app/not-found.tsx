@@ -21,7 +21,7 @@ export default function GlobalNotFound() {
               Cette page n&apos;existe pas ou n&apos;est pas encore disponible.
             </p>
             <a
-              href="/fr"
+              href="/"
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25"
             >
               Retour à l&apos;accueil

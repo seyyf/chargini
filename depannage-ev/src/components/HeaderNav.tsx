@@ -6,7 +6,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, X, LogOut, LayoutDashboard, Zap } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { Logo } from "./Logo";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationBell } from "./notifications/NotificationBell";
 import { signOutAction } from "@/app/actions/auth";
 
@@ -64,7 +63,6 @@ export function HeaderNav({ isAuthed }: { isAuthed: boolean }) {
         {/* Desktop right cluster */}
         <div className="hidden items-center gap-2 md:flex">
           {isAuthed && <NotificationBell />}
-          <LanguageSwitcher />
           {isAuthed ? (
             <>
               <Link
@@ -175,9 +173,6 @@ export function HeaderNav({ isAuthed }: { isAuthed: boolean }) {
                   </Link>
                 </>
               )}
-              <div className="mt-2 flex justify-end px-1">
-                <LanguageSwitcher />
-              </div>
             </div>
           </motion.div>
         )}
