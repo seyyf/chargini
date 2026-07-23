@@ -19,8 +19,8 @@ export async function ChargerGallery({
 
   if (!hero) {
     return (
-      <div className="flex aspect-[16/10] w-full items-center justify-center rounded-2xl bg-mesh">
-        <Zap className="h-16 w-16 text-brand-400" aria-hidden="true" />
+      <div className="flex h-40 w-full items-center justify-center rounded-2xl bg-mesh sm:h-48 lg:h-56">
+        <Zap className="h-12 w-12 text-brand-400" aria-hidden="true" />
       </div>
     );
   }
@@ -34,7 +34,7 @@ export async function ChargerGallery({
           <img
             src={hero}
             alt={title}
-            className="aspect-[4/3] w-full rounded-2xl object-cover shadow-sm lg:aspect-[16/10]"
+            className="h-40 w-full rounded-2xl object-cover shadow-sm sm:h-48 lg:h-56"
           />
           {photos.length > 1 && (
             <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
@@ -75,7 +75,7 @@ export async function ChargerGallery({
               src={photo}
               alt={`${title} — ${i + 2}`}
               loading="lazy"
-              className="h-20 w-28 shrink-0 rounded-xl object-cover"
+              className="h-14 w-20 shrink-0 rounded-lg object-cover"
             />
           ))}
         </div>

@@ -31,7 +31,11 @@ export default async function LocaleLayout({
     notFound();
   }
   return (
-    <html lang={locale} className={`${spaceGrotesk.variable} ${inter.variable}`}>
+    <html
+      lang={locale}
+      className={`${spaceGrotesk.variable} ${inter.variable}`}
+      suppressHydrationWarning
+    >
       <body className="min-h-screen bg-surface text-ink antialiased">
         <NextIntlClientProvider>
           <AppHeader />

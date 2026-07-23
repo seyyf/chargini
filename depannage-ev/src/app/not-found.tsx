@@ -7,7 +7,7 @@ import "./globals.css";
 // French copy only.
 export default function GlobalNotFound() {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body className="min-h-screen bg-surface text-ink antialiased">
         <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-mesh">
           <div className="relative mx-auto max-w-2xl px-6 py-24 text-center">
