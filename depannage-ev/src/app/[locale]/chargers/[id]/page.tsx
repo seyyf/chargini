@@ -148,8 +148,8 @@ export default async function ChargerDetailPage({
             </div>
           )}
 
-          <AvailabilityTable availability={charger.availability} />
           <ReviewList reviews={charger.reviews} />
+          <AvailabilityTable availability={charger.availability} />
         </div>
 
         {/* Sidebar (sticky on desktop) */}
