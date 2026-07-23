@@ -27,7 +27,10 @@ export async function getActiveChargers(): Promise<Charger[]> {
     .from("chargers")
     .select(CHARGER_COLUMNS)
     .eq("is_active", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    // Safety cap: the list renders in pages of 12 and the map plots these pins.
+    // Beyond this scale, move filtering + pagination server-side (URL params).
+    .limit(500);
 
   if (error) {
     console.error("[getActiveChargers] Supabase error:", error);

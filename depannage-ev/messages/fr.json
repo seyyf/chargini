@@ -118,6 +118,7 @@
     "showMap": "Carte",
     "showList": "Liste",
     "openFilters": "Filtres",
+    "loadMore": "Charger plus de bornes",
     "filters": {
       "heading": "Filtres",
       "connector": "Type de prise",
@@ -152,6 +153,7 @@
     "reviewsSubtitle": "Chaque avis provient d'une recharge terminée et vérifiée.",
     "avisCount": "{count} avis",
     "verifiedCharge": "Recharge vérifiée",
+    "showMoreReviews": "Voir plus d'avis",
     "beFirst": "Aucun avis pour l'instant. Réservez et rechargez pour laisser le tout premier avis.",
     "noReviews": "Pas encore d'avis.",
     "ratingSummary": "{avg} ({count})",

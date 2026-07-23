@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import {
@@ -30,6 +30,10 @@ const ChargerMap = dynamic<ChargerMapProps>(
   { ssr: false },
 );
 
+// How many charger cards to render at a time (the list "Load more" page size).
+// The map still shows all pins; this only bounds how many cards are in the DOM.
+const PAGE_SIZE = 12;
+
 function activeFilterCount(f: ChargerFilters): number {
   return (
     f.connectorTypes.length +
@@ -45,6 +49,7 @@ export function ExploreClient({ chargers }: { chargers: Charger[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [view, setView] = useState<"list" | "map">("list");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [visible, setVisible] = useState(PAGE_SIZE);
 
   const filtered = useMemo(
     () => filterChargers(chargers, filters),
@@ -54,6 +59,20 @@ export function ExploreClient({ chargers }: { chargers: Charger[] }) {
   const selected = selectedId
     ? filtered.find((c) => c.id === selectedId) ?? null
     : null;
+
+  // Reset the visible window whenever the filtered set changes.
+  useEffect(() => setVisible(PAGE_SIZE), [filters]);
+
+  const shown = filtered.slice(0, visible);
+
+  // Selecting a pin that isn't rendered yet expands the list to include it.
+  function handleSelect(id: string | null) {
+    setSelectedId(id);
+    if (id) {
+      const idx = filtered.findIndex((c) => c.id === id);
+      if (idx >= visible) setVisible(idx + 1);
+    }
+  }
 
   return (
     <div className="mt-4">
@@ -123,7 +142,22 @@ export function ExploreClient({ chargers }: { chargers: Charger[] }) {
               <p className="mt-1 text-sm text-ink-soft">{t("emptyHint")}</p>
             </div>
           ) : (
-            <ChargerList chargers={filtered} selectedId={selectedId} />
+            <>
+              <ChargerList chargers={shown} selectedId={selectedId} />
+              {filtered.length > visible && (
+                <div className="mt-6 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setVisible((v) => Math.min(v + PAGE_SIZE, filtered.length))
+                    }
+                    className="cursor-pointer rounded-xl border border-brand-200 bg-white px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-brand-50"
+                  >
+                    {t("loadMore")} ({filtered.length - visible})
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -137,7 +171,7 @@ export function ExploreClient({ chargers }: { chargers: Charger[] }) {
             <ChargerMap
               chargers={filtered}
               selectedId={selectedId}
-              onSelect={setSelectedId}
+              onSelect={handleSelect}
               active={view === "map"}
             />
           </div>

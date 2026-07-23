@@ -180,7 +180,8 @@ export async function listDriverBookings(userId: string): Promise<BookingWithRef
     .from("bookings")
     .select(BOOKING_COLUMNS)
     .eq("driver_id", userId)
-    .order("start_time", { ascending: false });
+    .order("start_time", { ascending: false })
+    .limit(50);
 
   if (error) {
     console.error("[listDriverBookings] fetch error:", error);
@@ -217,7 +218,8 @@ export async function listHostBookings(userId: string): Promise<BookingWithRefs[
     .from("bookings")
     .select(BOOKING_COLUMNS)
     .in("charger_id", chargerIds)
-    .order("start_time", { ascending: false });
+    .order("start_time", { ascending: false })
+    .limit(50);
 
   if (error) {
     console.error("[listHostBookings] bookings fetch error:", error);
@@ -238,6 +240,7 @@ export async function listHostChargers(userId: string): Promise<Charger[]> {
   const { data, error } = await supabase
     .from("chargers")
     .select(CHARGER_ALL_COLUMNS)
+    .limit(50)
     .eq("host_id", userId)
     .order("created_at", { ascending: false });
 

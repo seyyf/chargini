@@ -24,6 +24,7 @@ function makeSelectChain(resolveWith: { data: unknown; error: unknown }) {
   chain.eq = noop;
   chain.in = noop;
   chain.order = noop;
+  chain.limit = noop;
   chain.single = () => Promise.resolve(resolveWith);
   // make awaiting the chain work too
   (chain as Promise<unknown> & Record<string, unknown>).then = (fn: (v: unknown) => unknown) =>

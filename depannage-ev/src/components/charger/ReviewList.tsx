@@ -1,12 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { Star, ShieldCheck, MessageSquareText } from "lucide-react";
 import type { ChargerDetail } from "@/lib/chargers/queries";
+import { ReviewCards } from "./ReviewCards";
 
 type ReviewListProps = {
   reviews: ChargerDetail["reviews"];
 };
-
-const dateFormatter = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" });
 
 /** A row of 5 stars, filled up to `rating`. */
 function Stars({ rating, className = "h-4 w-4" }: { rating: number; className?: string }) {
@@ -102,57 +101,8 @@ export async function ReviewList({ reviews }: ReviewListProps) {
             </div>
           </div>
 
-          {/* Individual reviews */}
-          <ul className="mt-4 space-y-3">
-            {reviews.map((review) => {
-              const name = review.reviewer.full_name || "Utilisateur";
-              const initial = name.charAt(0).toUpperCase();
-              return (
-                <li
-                  key={review.id}
-                  className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm"
-                >
-                  <div className="flex items-start gap-3">
-                    {review.reviewer.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={review.reviewer.avatar_url}
-                        alt={name}
-                        className="h-11 w-11 shrink-0 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700">
-                        {initial}
-                      </div>
-                    )}
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                        <p className="font-semibold text-ink">{name}</p>
-                        <p className="text-xs text-ink-faint">
-                          {dateFormatter.format(new Date(review.created_at))}
-                        </p>
-                      </div>
-
-                      <div className="mt-1 flex flex-wrap items-center gap-2">
-                        <Stars rating={review.rating} className="h-3.5 w-3.5" />
-                        <span className="inline-flex items-center gap-1 rounded-full bg-charge-500/10 px-2 py-0.5 text-[11px] font-medium text-charge-600">
-                          <ShieldCheck className="h-3 w-3" />
-                          {t("verifiedCharge")}
-                        </span>
-                      </div>
-
-                      {review.comment && (
-                        <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                          {review.comment}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          {/* Individual reviews (with "show more") */}
+          <ReviewCards reviews={reviews} />
         </>
       )}
     </div>
