@@ -37,9 +37,9 @@ const CONNECTOR_LABELS: Record<string, string> = {
 export default async function BookingDetailPage({
   params,
 }: {
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { locale, id } = await params;
+  const { id } = await params;
 
   const supabase = await createSupabaseServerClient();
   const {
@@ -47,7 +47,7 @@ export default async function BookingDetailPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/auth", locale });
+    redirect("/auth");
   }
 
   const booking = await getBookingDetail(id);

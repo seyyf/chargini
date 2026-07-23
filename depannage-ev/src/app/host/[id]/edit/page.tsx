@@ -8,9 +8,9 @@ import { ListingForm } from "@/components/host/ListingForm";
 export default async function HostEditPage({
   params,
 }: {
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { locale, id } = await params;
+  const { id } = await params;
 
   const supabase = await createSupabaseServerClient();
   const {
@@ -18,7 +18,7 @@ export default async function HostEditPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/auth", locale });
+    redirect("/auth");
   }
 
   const detail = await getChargerDetail(id);

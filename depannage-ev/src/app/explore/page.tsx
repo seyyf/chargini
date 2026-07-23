@@ -2,14 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { getActiveChargers } from "@/lib/chargers/queries";
 import { ExploreClient } from "@/components/explore/ExploreClient";
 
-export default async function ExplorePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  // Await params per Next.js 16 convention
-  await params;
-
+export default async function ExplorePage() {
   const [t, chargers] = await Promise.all([
     getTranslations("explore"),
     getActiveChargers(),

@@ -12,13 +12,7 @@ import { IncomingBookingRow } from "@/components/dashboard/IncomingBookingRow";
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default async function DashboardPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-
+export default async function DashboardPage() {
   // Auth guard
   const supabase = await createSupabaseServerClient();
   const {
@@ -26,7 +20,7 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/auth", locale });
+    redirect("/auth");
   }
 
   // Parallel data fetch (user is guaranteed non-null after redirect)

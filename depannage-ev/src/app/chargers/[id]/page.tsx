@@ -22,7 +22,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export default async function ChargerDetailPage({
   params,
 }: {
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
 

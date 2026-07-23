@@ -1,12 +1,11 @@
-import { type NextRequest } from "next/server";
-import createIntlMiddleware from "next-intl/middleware";
+import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { routing } from "./src/i18n/routing";
 
-const intlMiddleware = createIntlMiddleware(routing);
-
+// Refreshes the Supabase auth session on navigation (production only — Next's
+// Turbopack dev server does not run middleware, which is fine: routing is
+// file-based and the server client still reads/refreshes tokens on its own).
 export async function middleware(request: NextRequest) {
-  let response = intlMiddleware(request);
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,16 +16,13 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // Per Supabase's SSR cookie contract, refreshed cookies must be
-          // mirrored onto the request (so getAll() and downstream Server
-          // Components see the new token on THIS request) and onto the
-          // response (so the browser receives it). Mutating request.cookies
-          // and only then rebuilding the response ensures the intl
-          // middleware's response carries the updated request headers.
+          // Mirror refreshed cookies onto the request (so downstream Server
+          // Components see the new token this request) and the response (so
+          // the browser stores it).
           cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
-          response = intlMiddleware(request);
+          response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });

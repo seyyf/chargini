@@ -7,7 +7,7 @@ import { ReviewList } from "@/components/charger/ReviewList";
 export default async function PublicProfilePage({
   params,
 }: {
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
 

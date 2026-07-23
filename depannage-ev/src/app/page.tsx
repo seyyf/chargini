@@ -6,13 +6,7 @@ import { ChargerCard } from "@/components/explore/ChargerCard";
 import { Reveal } from "@/components/Reveal";
 import { HeroArt } from "@/components/home/HeroArt";
 
-export default async function HomePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  await params;
-
+export default async function HomePage() {
   const [t, chargers] = await Promise.all([
     getTranslations("home"),
     getActiveChargers(),

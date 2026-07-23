@@ -3,20 +3,14 @@ import { redirect } from "@/i18n/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ListingForm } from "@/components/host/ListingForm";
 
-export default async function HostNewPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-
+export default async function HostNewPage() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/auth", locale });
+    redirect("/auth");
   }
 
   const t = await getTranslations("host");
