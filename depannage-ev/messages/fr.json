@@ -235,6 +235,8 @@
     "date": "Date",
     "start": "Heure de début",
     "end": "Heure de fin",
+    "chooseTime": "—",
+    "noSlotsThatDay": "Aucune disponibilité ce jour-là.",
     "total": "Total",
     "estimated": "Estimation",
     "notAvailable": "Ce créneau n'est pas dans les disponibilités de la borne.",

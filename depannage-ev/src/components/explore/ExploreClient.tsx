@@ -12,7 +12,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import type { Charger } from "@/types/database";
+import type { ChargerListItem } from "@/lib/chargers/queries";
 import {
   ChargerFilters,
   EMPTY_FILTERS,
@@ -43,7 +43,7 @@ function activeFilterCount(f: ChargerFilters): number {
   );
 }
 
-export function ExploreClient({ chargers }: { chargers: Charger[] }) {
+export function ExploreClient({ chargers }: { chargers: ChargerListItem[] }) {
   const t = useTranslations("explore");
   const [filters, setFilters] = useState<ChargerFilters>(EMPTY_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);

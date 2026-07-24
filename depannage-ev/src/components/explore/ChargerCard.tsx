@@ -2,13 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { Zap, Plug, Gauge, MapPin, ArrowRight } from "lucide-react";
+import { Zap, Plug, Gauge, MapPin, ArrowRight, Star } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import type { Charger } from "@/types/database";
 import { CONNECTOR_LABELS, formatPrice, formatPower } from "@/lib/chargers/format";
+import type { ChargerListItem } from "@/lib/chargers/queries";
 
 interface ChargerCardProps {
-  charger: Charger;
+  charger: ChargerListItem;
   /** Currently selected charger id (synced with map). */
   selectedId?: string | null;
 }
@@ -56,6 +56,16 @@ export function ChargerCard({ charger, selectedId }: ChargerCardProps) {
           <span className="absolute right-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-brand-800 shadow-sm backdrop-blur">
             {formatPrice(charger.price_amount, charger.price_unit)}
           </span>
+          {/* Rating pill (host reviews) */}
+          {charger.ratingCount > 0 && (
+            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-bold text-ink shadow-sm backdrop-blur">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              {charger.ratingAvg.toFixed(1).replace(".", ",")}
+              <span className="font-normal text-ink-faint">
+                ({charger.ratingCount})
+              </span>
+            </span>
+          )}
           {/* City chip */}
           <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
             <MapPin className="h-3 w-3 text-brand-300" />

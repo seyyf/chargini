@@ -2,10 +2,15 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, Wallet, Info } from "lucide-react";
+import { Loader2, Wallet, Info, Calendar, Clock } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import type { AvailabilityRule } from "@/types/database";
-import { isWithinAvailability, hasAnyAvailability } from "@/lib/bookings/availability";
+import {
+  isWithinAvailability,
+  hasAnyAvailability,
+  dayOfWeekOf,
+  windowsForWeekday,
+} from "@/lib/bookings/availability";
 import { calculateBookingTotal } from "@/lib/pricing";
 import { createBooking } from "@/app/actions/bookings";
 
@@ -37,6 +42,60 @@ function formatTND(amount: number): string {
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+// ── 24-hour time slots (Tunisia uses a 24h clock — no AM/PM) ────────────────────
+
+const SLOT_STEP = 30; // minutes
+
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function toHHMM(mins: number): string {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+type Window = { start_time: string; end_time: string };
+
+/** Valid start times (30-min steps) inside the day's availability windows. */
+function startSlots(windows: Window[]): string[] {
+  const set = new Set<string>();
+  for (const w of windows) {
+    const end = toMinutes(w.end_time);
+    for (let t = toMinutes(w.start_time); t <= end - SLOT_STEP; t += SLOT_STEP) {
+      set.add(toHHMM(t));
+    }
+  }
+  return [...set].sort();
+}
+
+/** Valid end times after `start`, within the same window. */
+function endSlots(windows: Window[], start: string): string[] {
+  if (!start) return [];
+  const s = toMinutes(start);
+  const w = windows.find(
+    (win) => toMinutes(win.start_time) <= s && s < toMinutes(win.end_time),
+  );
+  if (!w) return [];
+  const out: string[] = [];
+  for (let t = s + SLOT_STEP; t <= toMinutes(w.end_time); t += SLOT_STEP) {
+    out.push(toHHMM(t));
+  }
+  return out;
+}
+
+/** "mercredi 30 juillet" for a "YYYY-MM-DD" string. */
+function formatFrDate(dateISO: string): string {
+  const [y, m, d] = dateISO.split("-").map(Number);
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(y, m - 1, d));
 }
 
 // ── ReserveConfirmModal ─────────────────────────────────────────────────────────
@@ -255,6 +314,13 @@ export function BookingWidget({
   const notAvailable = slotChosen && !valid;
   const isFree = charger.priceAmount === 0;
 
+  // 24-hour time-slot options derived from the selected day's availability.
+  const weekday = date ? dayOfWeekOf(date) : null;
+  const windows = weekday !== null ? windowsForWeekday(availability, weekday) : [];
+  const startTimes = startSlots(windows);
+  const endTimes = endSlots(windows, startTime);
+  const dayHasNoSlots = Boolean(date) && windows.length === 0;
+
   return (
     <>
       <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
@@ -263,43 +329,86 @@ export function BookingWidget({
         </h2>
 
         <div className="space-y-3">
+          {/* Date */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-ink-soft">
+            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+              <Calendar className="h-3.5 w-3.5 text-brand-600" />
               {t("date")}
             </label>
             <input
               type="date"
               value={date}
               min={todayISO()}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
+              onChange={(e) => {
+                setDate(e.target.value);
+                setStartTime("");
+                setEndTime("");
+              }}
+              className="w-full cursor-pointer rounded-xl border border-brand-100 bg-surface/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-brand-400 focus:bg-white"
             />
           </div>
 
-          <div>
-            <label className="mb-1 block text-xs font-medium text-ink-soft">
-              {t("start")}
-            </label>
-            <input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
-            />
-          </div>
+          {dayHasNoSlots ? (
+            <p className="rounded-xl bg-amber-50 px-3 py-2.5 text-sm text-amber-700">
+              {t("noSlotsThatDay")}
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {/* Start (24h) */}
+              <div>
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+                  <Clock className="h-3.5 w-3.5 text-brand-600" />
+                  {t("start")}
+                </label>
+                <select
+                  value={startTime}
+                  disabled={!date}
+                  onChange={(e) => {
+                    setStartTime(e.target.value);
+                    setEndTime("");
+                  }}
+                  className="w-full cursor-pointer rounded-xl border border-brand-100 bg-surface/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-brand-400 focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">{t("chooseTime")}</option>
+                  {startTimes.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <div>
-            <label className="mb-1 block text-xs font-medium text-ink-soft">
-              {t("end")}
-            </label>
-            <input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:bg-white"
-            />
-          </div>
+              {/* End (24h) */}
+              <div>
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+                  <Clock className="h-3.5 w-3.5 text-brand-600" />
+                  {t("end")}
+                </label>
+                <select
+                  value={endTime}
+                  disabled={!startTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-full cursor-pointer rounded-xl border border-brand-100 bg-surface/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-brand-400 focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">{t("chooseTime")}</option>
+                  {endTimes.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Selected slot summary (24h, French date) */}
+        {valid && (
+          <div className="mt-3 rounded-xl border border-brand-100 bg-brand-50/50 px-3 py-2.5 text-sm text-ink">
+            <span className="font-medium capitalize">{formatFrDate(date)}</span>{" "}
+            · {startTime} – {endTime}
+          </div>
+        )}
 
         {notAvailable && (
           <p className="mt-3 text-sm font-medium text-red-600">
