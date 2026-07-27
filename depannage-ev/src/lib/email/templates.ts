@@ -68,11 +68,28 @@ function contentFor(kind: BookingEmailKind, p: BookingEmailParams): EmailContent
   }
 }
 
+/** Escapes HTML special characters (charger titles and names are user input). */
+function esc(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function bookingEmail(
   kind: BookingEmailKind,
   p: BookingEmailParams,
 ): { subject: string; html: string; text: string } {
+  // Subject + plain text use the raw values; the HTML body uses escaped ones.
   const c = contentFor(kind, p);
+  const cHtml = contentFor(kind, {
+    chargerTitle: esc(p.chargerTitle),
+    slotLabel: esc(p.slotLabel),
+    url: p.url,
+    counterpartName: esc(p.counterpartName),
+  });
   const text = `${c.heading}\n\n${c.body}\n\n${c.cta} : ${p.url}\n\n— Chargini · Initiative 100% bénévole`;
   const html = `<!doctype html>
 <html lang="fr">
@@ -82,9 +99,9 @@ export function bookingEmail(
         <span style="color:#ffffff;font-size:20px;font-weight:bold;">Charg<span style="color:#22d3ee;">ini</span></span>
       </div>
       <div style="padding:28px;">
-        <h1 style="margin:0 0 12px;font-size:20px;color:#06202b;">${c.heading}</h1>
-        <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#35525f;">${c.body}</p>
-        <a href="${p.url}" style="display:inline-block;background:#06202b;color:#ffffff;text-decoration:none;font-weight:bold;font-size:14px;padding:12px 22px;border-radius:12px;">${c.cta}</a>
+        <h1 style="margin:0 0 12px;font-size:20px;color:#06202b;">${cHtml.heading}</h1>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#35525f;">${cHtml.body}</p>
+        <a href="${esc(p.url)}" style="display:inline-block;background:#06202b;color:#ffffff;text-decoration:none;font-weight:bold;font-size:14px;padding:12px 22px;border-radius:12px;">${cHtml.cta}</a>
       </div>
       <div style="padding:16px 28px;border-top:1px solid #cffafe;">
         <p style="margin:0;font-size:12px;color:#6b8592;">Chargini · La recharge entre particuliers en Tunisie · Initiative 100% bénévole</p>

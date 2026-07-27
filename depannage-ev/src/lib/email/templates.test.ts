@@ -46,6 +46,20 @@ describe("bookingEmail", () => {
     expect(bookingEmail("requested", PARAMS).html).toContain("Amine");
   });
 
+  it("escapes HTML in user-controlled fields (no injection into the email)", () => {
+    const { html, text } = bookingEmail("requested", {
+      ...PARAMS,
+      chargerTitle: `<img src=x onerror=alert(1)> & "borne"`,
+      counterpartName: "<b>Evil</b>",
+    });
+    expect(html).not.toContain("<img src=x");
+    expect(html).not.toContain("<b>Evil</b>");
+    expect(html).toContain("&lt;img src=x");
+    expect(html).toContain("&lt;b&gt;Evil&lt;/b&gt;");
+    // Plain-text part stays raw (no HTML context to inject into).
+    expect(text).toContain("<img src=x");
+  });
+
   it("falls back gracefully when the counterpart has no name", () => {
     const { html } = bookingEmail("requested", {
       ...PARAMS,
