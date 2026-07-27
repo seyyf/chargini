@@ -18,7 +18,7 @@
     "heroSubtitle": "Des particuliers partagent leur borne. Réservez un créneau, rechargez, c'est tout.",
     "ctaExplore": "Voir les bornes",
     "ctaHost": "Proposer ma borne",
-    "trustNote": "Sans engagement · Paiement en main propre",
+    "trustNote": "Initiative 100% bénévole · Sans commission · Sans engagement",
     "stats": {
       "chargersLabel": "Bornes actives",
       "citiesLabel": "Villes couvertes",
@@ -28,7 +28,7 @@
     "citiesTitle": "Déjà disponible dans",
     "hostCta": {
       "title": "Vous avez une borne chez vous ?",
-      "subtitle": "Rentabilisez-la quand vous ne l'utilisez pas. Vous fixez le prix et vos disponibilités — nous nous occupons du reste.",
+      "subtitle": "Partagez-la avec la communauté quand vous ne l'utilisez pas. Vous fixez vos disponibilités, et vous aidez la mobilité électrique à avancer en Tunisie.",
       "button": "Devenir hôte"
     },
     "how": {
@@ -46,8 +46,8 @@
       "title": "Pourquoi Chargini",
       "verifiedTitle": "Hôtes vérifiés",
       "verifiedBody": "Chaque hôte est contrôlé avant publication pour garantir votre tranquillité d'esprit.",
-      "easyTitle": "Paiement simple",
-      "easyBody": "Réglez en ligne en toute sécurité, sans surprise ni cash.",
+      "easyTitle": "100% bénévole",
+      "easyBody": "Chargini est gratuit et sans commission. Le prix éventuel d'une borne couvre uniquement le coût de l'électricité.",
       "reviewsTitle": "Avis transparents",
       "reviewsBody": "Les conducteurs partagent leurs expériences pour vous aider à faire le bon choix."
     },
@@ -290,7 +290,7 @@
     "title": "Tableau de bord",
     "hostSection": "Mes bornes",
     "incoming": "Demandes de réservation",
-    "earnings": "Revenus (simulés)",
+    "earnings": "Total des recharges accueillies (indicatif)",
     "driverSection": "Mes réservations",
     "upcoming": "À venir",
     "past": "Passées",

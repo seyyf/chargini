@@ -77,8 +77,12 @@ export function HeroArt() {
             <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
             4,9
           </span>
-          <span className="font-display text-sm font-bold text-brand-700">
-            0,45 TND<span className="text-xs font-normal text-ink-faint">/kWh</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-charge-500/10 px-2.5 py-1 text-xs font-semibold text-charge-600">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute h-full w-full rounded-full bg-charge-500 pulse-ring" />
+              <span className="relative h-2 w-2 rounded-full bg-charge-500" />
+            </span>
+            Disponible
           </span>
         </div>
       </div>

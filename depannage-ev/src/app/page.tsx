@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { Search, CalendarCheck, Zap, ShieldCheck, Wallet, MapPin, Star, ArrowRight, Sparkles } from "lucide-react";
+import { Search, CalendarCheck, Zap, ShieldCheck, HeartHandshake, MapPin, Star, ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getActiveChargers } from "@/lib/chargers/queries";
 import { ChargerCard } from "@/components/explore/ChargerCard";
@@ -30,7 +30,7 @@ export default async function HomePage() {
 
   const reasons = [
     { icon: ShieldCheck, title: t("why.verifiedTitle"), body: t("why.verifiedBody") },
-    { icon: Wallet, title: t("why.easyTitle"), body: t("why.easyBody") },
+    { icon: HeartHandshake, title: t("why.easyTitle"), body: t("why.easyBody") },
     { icon: Star, title: t("why.reviewsTitle"), body: t("why.reviewsBody") },
   ];
 
@@ -103,7 +103,6 @@ export default async function HomePage() {
           <h2 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
             {t("how.title")}
           </h2>
-          <p className="mt-3 text-lg text-ink-soft">{t("heroSubtitle")}</p>
         </Reveal>
 
         <div className="mt-16 grid gap-6 md:grid-cols-3">
@@ -137,7 +136,6 @@ export default async function HomePage() {
                 <h2 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
                   {t("featured")}
                 </h2>
-                <p className="mt-2 text-ink-soft">{t("citiesTitle")} {cities.slice(0, 4).join(", ")}…</p>
               </div>
               <Link
                 href="/explore"
@@ -184,21 +182,22 @@ export default async function HomePage() {
           ))}
         </div>
 
-        {/* Cities marquee */}
+        {/* Cities — calm static row */}
         {cities.length > 0 && (
-          <div className="mt-16 overflow-hidden rounded-2xl border border-brand-100 bg-white py-5">
-            <div className="flex items-center gap-3 whitespace-nowrap">
-              <div className="animate-marquee flex shrink-0 items-center gap-3 pr-3">
-                {[...cities, ...cities, ...cities, ...cities].map((c, i) => (
-                  <span
-                    key={`${c}-${i}`}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-800"
-                  >
-                    <MapPin className="h-3.5 w-3.5 text-charge-500" />
-                    {c}
-                  </span>
-                ))}
-              </div>
+          <div className="mt-16 rounded-2xl border border-brand-100 bg-white px-6 py-5">
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              <span className="mr-1 text-sm font-medium text-ink-faint">
+                {t("citiesTitle")}
+              </span>
+              {cities.map((c) => (
+                <span
+                  key={c}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-800"
+                >
+                  <MapPin className="h-3.5 w-3.5 text-charge-500" />
+                  {c}
+                </span>
+              ))}
             </div>
           </div>
         )}

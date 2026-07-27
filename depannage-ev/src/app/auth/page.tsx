@@ -121,7 +121,7 @@ export default function AuthPage({
             {[
               { icon: MapPin, label: "Des bornes partout en Tunisie" },
               { icon: ShieldCheck, label: "Hôtes vérifiés et notés" },
-              { icon: Star, label: "Prix transparents, sans surprise" },
+              { icon: Star, label: "100% bénévole, sans commission" },
             ].map((f) => (
               <li key={f.label} className="flex items-center gap-3 text-white/80">
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-brand-300 ring-1 ring-white/10">
