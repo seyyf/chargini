@@ -2,11 +2,14 @@
 
 import { use, useState } from "react";
 import { useTranslations } from "next-intl";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Mail, Lock, Loader2, ShieldCheck, MapPin, Star } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { authErrorKey } from "@/lib/authErrors";
 import { LogoMark } from "@/components/Logo";
+
+type AuthMode = "signin" | "signup";
 
 function GoogleIcon() {
   return (
@@ -39,8 +42,10 @@ export default function AuthPage({
   const t = useTranslations("auth");
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
+  const reduce = useReducedMotion();
   const { error: callbackError } = use(searchParams);
 
+  const [mode, setMode] = useState<AuthMode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(
@@ -48,6 +53,14 @@ export default function AuthPage({
   );
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Switching tabs keeps the typed email/password but clears feedback.
+  function switchMode(next: AuthMode) {
+    if (next === mode) return;
+    setMode(next);
+    setError(null);
+    setMessage(null);
+  }
 
   async function handleSignIn() {
     setError(null);
@@ -101,6 +114,11 @@ export default function AuthPage({
     }
   }
 
+  const tabs: Array<{ key: AuthMode; label: string }> = [
+    { key: "signin", label: t("tabSignIn") },
+    { key: "signup", label: t("tabSignUp") },
+  ];
+
   return (
     <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-stretch gap-8 px-4 py-8 md:grid-cols-2 md:px-6">
       {/* Brand panel */}
@@ -138,97 +156,157 @@ export default function AuthPage({
 
       {/* Form panel */}
       <div className="flex items-center justify-center">
-        <div className="w-full max-w-md rounded-3xl border border-brand-100 bg-white p-8 shadow-xl shadow-brand-900/5 sm:p-10">
-          <div className="mb-8 flex items-center gap-2.5 md:hidden">
+        <div className="w-full max-w-md rounded-3xl border border-brand-100 bg-white p-6 shadow-xl shadow-brand-900/5 sm:p-10">
+          <div className="mb-6 flex items-center gap-2.5 md:hidden">
             <LogoMark className="h-9 w-9" />
             <span className="font-display text-xl font-bold text-ink">
               Charg<span className="text-gradient">ini</span>
             </span>
           </div>
 
-          <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
-            {t("title")}
-          </h1>
+          <h1 className="sr-only">{t("title")}</h1>
 
-          <form
-            className="mt-7 flex flex-col gap-4"
-            onSubmit={(e) => e.preventDefault()}
+          {/* Tabs */}
+          <div
+            role="tablist"
+            aria-label={t("title")}
+            className="mb-7 grid grid-cols-2 gap-1 rounded-xl border border-brand-100 bg-surface/60 p-1"
           >
-            <label className="flex flex-col gap-1.5 text-sm font-medium text-ink-soft">
-              {t("email")}
-              <div className="relative">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-brand-100 bg-surface/60 py-2.5 pl-10 pr-3 text-base text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
-                  autoComplete="email"
-                  placeholder="vous@exemple.com"
-                />
+            {tabs.map((tab) => {
+              const active = mode === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => switchMode(tab.key)}
+                  className={`relative cursor-pointer rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    active ? "text-white" : "text-ink-soft hover:text-ink"
+                  }`}
+                >
+                  {active &&
+                    (reduce ? (
+                      <span className="absolute inset-0 rounded-lg bg-ink" />
+                    ) : (
+                      <motion.span
+                        layoutId="auth-tab-pill"
+                        className="absolute inset-0 rounded-lg bg-ink"
+                        transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                      />
+                    ))}
+                  <span className="relative">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.form
+              key={mode}
+              initial={reduce ? false : { opacity: 0, x: mode === "signin" ? -14 : 14 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={reduce ? undefined : { opacity: 0, x: mode === "signin" ? 14 : -14 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
+              className="flex flex-col gap-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (loading) return;
+                if (mode === "signin") handleSignIn();
+                else handleSignUp();
+              }}
+            >
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-ink-soft">
+                {t("email")}
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full rounded-xl border border-brand-100 bg-surface/60 py-2.5 pl-10 pr-3 text-base text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
+                    autoComplete="email"
+                    placeholder="vous@exemple.com"
+                  />
+                </div>
+              </label>
+
+              <label className="flex flex-col gap-1.5 text-sm font-medium text-ink-soft">
+                {t("password")}
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
+                  <input
+                    type="password"
+                    required
+                    minLength={mode === "signup" ? 6 : undefined}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full rounded-xl border border-brand-100 bg-surface/60 py-2.5 pl-10 pr-3 text-base text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
+                    autoComplete={
+                      mode === "signup" ? "new-password" : "current-password"
+                    }
+                    placeholder="••••••••"
+                  />
+                </div>
+                {mode === "signup" && (
+                  <span className="text-xs font-normal text-ink-faint">
+                    {t("passwordHint")}
+                  </span>
+                )}
+              </label>
+
+              {error && (
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                  {error}
+                </p>
+              )}
+              {message && (
+                <p className="rounded-lg bg-charge-500/10 px-3 py-2 text-sm text-charge-600">
+                  {message}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-1 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-ink px-5 py-3 font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {mode === "signin" ? t("signIn") : t("signUp")}
+              </button>
+
+              <div className="my-1 flex items-center gap-3 text-xs text-ink-faint">
+                <span className="h-px flex-1 bg-brand-100" />
+                {t("or")}
+                <span className="h-px flex-1 bg-brand-100" />
               </div>
-            </label>
 
-            <label className="flex flex-col gap-1.5 text-sm font-medium text-ink-soft">
-              {t("password")}
-              <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-brand-100 bg-surface/60 py-2.5 pl-10 pr-3 text-base text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                />
-              </div>
-            </label>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleGoogle}
+                className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-brand-200 bg-white px-5 py-3 font-semibold text-ink transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <GoogleIcon />
+                {t("withGoogle")}
+              </button>
 
-            {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-                {error}
+              {/* Cross-tab hint */}
+              <p className="mt-1 text-center text-sm text-ink-soft">
+                {mode === "signin" ? t("noAccount") : t("haveAccount")}{" "}
+                <button
+                  type="button"
+                  onClick={() =>
+                    switchMode(mode === "signin" ? "signup" : "signin")
+                  }
+                  className="cursor-pointer font-semibold text-brand-700 hover:text-brand-800 hover:underline"
+                >
+                  {mode === "signin" ? t("tabSignUp") : t("tabSignIn")}
+                </button>
               </p>
-            )}
-            {message && (
-              <p className="rounded-lg bg-charge-500/10 px-3 py-2 text-sm text-charge-600">
-                {message}
-              </p>
-            )}
-
-            <button
-              type="button"
-              disabled={loading}
-              onClick={handleSignIn}
-              className="mt-1 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-ink px-5 py-3 font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {t("signIn")}
-            </button>
-            <button
-              type="button"
-              disabled={loading}
-              onClick={handleSignUp}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-5 py-3 font-semibold text-ink transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {t("signUp")}
-            </button>
-
-            <div className="my-1 flex items-center gap-3 text-xs text-ink-faint">
-              <span className="h-px flex-1 bg-brand-100" />
-              {t("or")}
-              <span className="h-px flex-1 bg-brand-100" />
-            </div>
-
-            <button
-              type="button"
-              disabled={loading}
-              onClick={handleGoogle}
-              className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-brand-200 bg-white px-5 py-3 font-semibold text-ink transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <GoogleIcon />
-              {t("withGoogle")}
-            </button>
-          </form>
+            </motion.form>
+          </AnimatePresence>
         </div>
       </div>
     </div>

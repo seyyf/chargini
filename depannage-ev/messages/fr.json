@@ -70,6 +70,11 @@
   "auth": {
     "title": "Connexion / Inscription",
     "brandLine": "Rejoignez la communauté de la recharge en Tunisie.",
+    "tabSignIn": "Connexion",
+    "tabSignUp": "Inscription",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "passwordHint": "6 caractères minimum",
     "or": "ou",
     "email": "Adresse e-mail",
     "password": "Mot de passe",
