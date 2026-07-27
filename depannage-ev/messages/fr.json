@@ -75,6 +75,22 @@
     "noAccount": "Pas encore de compte ?",
     "haveAccount": "Déjà un compte ?",
     "passwordHint": "6 caractères minimum",
+    "forgot": {
+      "link": "Mot de passe oublié ?",
+      "title": "Réinitialiser le mot de passe",
+      "intro": "Entrez votre adresse e-mail et nous vous enverrons un lien de réinitialisation.",
+      "submit": "Envoyer le lien",
+      "sent": "Si un compte existe avec cette adresse, un lien de réinitialisation vient d'être envoyé. Pensez à vérifier vos spams.",
+      "back": "Retour à la connexion"
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "intro": "Choisissez un nouveau mot de passe pour votre compte.",
+      "submit": "Mettre à jour le mot de passe",
+      "success": "Mot de passe mis à jour !",
+      "invalid": "Lien invalide ou expiré. Redemandez un lien depuis la page de connexion.",
+      "backToAuth": "Retour à la connexion"
+    },
     "or": "ou",
     "email": "Adresse e-mail",
     "password": "Mot de passe",
@@ -89,6 +105,7 @@
       "userAlreadyExists": "Un compte existe déjà avec cette adresse e-mail.",
       "emailNotConfirmed": "Veuillez confirmer votre e-mail avant de vous connecter.",
       "weakPassword": "Le mot de passe est trop faible (6 caractères minimum).",
+      "samePassword": "Le nouveau mot de passe doit être différent de l'ancien.",
       "emailInvalid": "Adresse e-mail invalide.",
       "rateLimited": "Trop de tentatives. Veuillez patienter puis réessayer.",
       "generic": "Une erreur est survenue. Veuillez réessayer."

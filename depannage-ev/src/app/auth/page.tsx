@@ -3,11 +3,12 @@
 import { use, useState } from "react";
 import { useTranslations } from "next-intl";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Mail, Lock, Loader2, ShieldCheck, MapPin, Star } from "lucide-react";
+import { Mail, Loader2, ShieldCheck, MapPin, Star, ArrowLeft } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { authErrorKey } from "@/lib/authErrors";
 import { LogoMark } from "@/components/Logo";
+import { PasswordInput } from "@/components/PasswordInput";
 
 type AuthMode = "signin" | "signup";
 
@@ -46,6 +47,7 @@ export default function AuthPage({
   const { error: callbackError } = use(searchParams);
 
   const [mode, setMode] = useState<AuthMode>("signin");
+  const [forgot, setForgot] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(
@@ -56,8 +58,15 @@ export default function AuthPage({
 
   // Switching tabs keeps the typed email/password but clears feedback.
   function switchMode(next: AuthMode) {
-    if (next === mode) return;
+    if (next === mode && !forgot) return;
     setMode(next);
+    setForgot(false);
+    setError(null);
+    setMessage(null);
+  }
+
+  function openForgot() {
+    setForgot(true);
     setError(null);
     setMessage(null);
   }
@@ -98,6 +107,22 @@ export default function AuthPage({
       return;
     }
     setMessage(t("checkEmail"));
+  }
+
+  async function handleForgot() {
+    setError(null);
+    setMessage(null);
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset`,
+    });
+    setLoading(false);
+    if (error) {
+      setError(t(`errors.${authErrorKey(error)}`));
+      return;
+    }
+    // Anti-enumeration: same message whether or not the account exists.
+    setMessage(t("forgot.sent"));
   }
 
   async function handleGoogle() {
@@ -202,6 +227,72 @@ export default function AuthPage({
           </div>
 
           <AnimatePresence mode="wait" initial={false}>
+            {forgot ? (
+              <motion.form
+                key="forgot"
+                initial={reduce ? false : { opacity: 0, x: 14 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={reduce ? undefined : { opacity: 0, x: 14 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+                className="flex flex-col gap-4"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!loading) handleForgot();
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => switchMode("signin")}
+                  className="inline-flex cursor-pointer items-center gap-1.5 self-start text-sm font-medium text-brand-700 hover:text-brand-800"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  {t("forgot.back")}
+                </button>
+
+                <div>
+                  <h2 className="font-display text-lg font-bold text-ink">
+                    {t("forgot.title")}
+                  </h2>
+                  <p className="mt-1 text-sm text-ink-soft">{t("forgot.intro")}</p>
+                </div>
+
+                <label className="flex flex-col gap-1.5 text-sm font-medium text-ink-soft">
+                  {t("email")}
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-xl border border-brand-100 bg-surface/60 py-2.5 pl-10 pr-3 text-base text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
+                      autoComplete="email"
+                      placeholder="vous@exemple.com"
+                    />
+                  </div>
+                </label>
+
+                {error && (
+                  <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {error}
+                  </p>
+                )}
+                {message && (
+                  <p className="rounded-lg bg-charge-500/10 px-3 py-2 text-sm text-charge-600">
+                    {message}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-1 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-ink px-5 py-3 font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {t("forgot.submit")}
+                </button>
+              </motion.form>
+            ) : (
             <motion.form
               key={mode}
               initial={reduce ? false : { opacity: 0, x: mode === "signin" ? -14 : 14 }}
@@ -234,27 +325,32 @@ export default function AuthPage({
 
               <label className="flex flex-col gap-1.5 text-sm font-medium text-ink-soft">
                 {t("password")}
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
-                  <input
-                    type="password"
-                    required
-                    minLength={mode === "signup" ? 6 : undefined}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-brand-100 bg-surface/60 py-2.5 pl-10 pr-3 text-base text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
-                    autoComplete={
-                      mode === "signup" ? "new-password" : "current-password"
-                    }
-                    placeholder="••••••••"
-                  />
-                </div>
+                <PasswordInput
+                  value={password}
+                  onChange={setPassword}
+                  minLength={mode === "signup" ? 6 : undefined}
+                  autoComplete={
+                    mode === "signup" ? "new-password" : "current-password"
+                  }
+                />
                 {mode === "signup" && (
                   <span className="text-xs font-normal text-ink-faint">
                     {t("passwordHint")}
                   </span>
                 )}
               </label>
+
+              {mode === "signin" && (
+                <div className="-mt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={openForgot}
+                    className="cursor-pointer text-sm font-medium text-brand-700 hover:text-brand-800 hover:underline"
+                  >
+                    {t("forgot.link")}
+                  </button>
+                </div>
+              )}
 
               {error && (
                 <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
@@ -306,6 +402,7 @@ export default function AuthPage({
                 </button>
               </p>
             </motion.form>
+            )}
           </AnimatePresence>
         </div>
       </div>

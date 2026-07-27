@@ -10,6 +10,7 @@ const CODE_TO_KEY: Record<string, string> = {
   identity_already_exists: "userAlreadyExists",
   email_not_confirmed: "emailNotConfirmed",
   weak_password: "weakPassword",
+  same_password: "samePassword",
   email_address_invalid: "emailInvalid",
   over_request_rate_limit: "rateLimited",
   over_email_send_rate_limit: "rateLimited",
