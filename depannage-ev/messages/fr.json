@@ -225,7 +225,7 @@
       "photos": "Photos",
       "availability": "Disponibilités"
     },
-    "locationHint": "Cliquez sur la carte pour placer votre borne.",
+    "locationHint": "Cliquez sur la carte pour placer votre borne — l'adresse et la ville se remplissent automatiquement. Vous pouvez aussi taper l'adresse : la carte s'y déplacera.",
     "addPhotos": "Ajouter des photos",
     "addAvailability": "Ajouter un créneau",
     "day": "Jour",

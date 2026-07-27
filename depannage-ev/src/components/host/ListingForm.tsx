@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { forwardGeocode } from "@/lib/geocode";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
@@ -105,6 +106,41 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
   // Validation + server errors
   const [fieldErrors, setFieldErrors] = useState<ListingErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
+
+  // ── Two-way geocoding ────────────────────────────────────────────────────
+  // Typing adresse/ville flies the map there; pinning the map fills them back.
+  const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
+  const skipInitialGeocodeRef = useRef(true);
+  const programmaticFillRef = useRef(false);
+
+  useEffect(() => {
+    // Don't geocode the pre-filled values on mount (edit mode)…
+    if (skipInitialGeocodeRef.current) {
+      skipInitialGeocodeRef.current = false;
+      return;
+    }
+    // …nor the values we just filled from a map click.
+    if (programmaticFillRef.current) {
+      programmaticFillRef.current = false;
+      return;
+    }
+    if (city.trim().length < 2) return;
+
+    // Debounced (Nominatim policy: ≥1s between requests).
+    const timer = setTimeout(async () => {
+      const query = [address.trim(), city.trim(), "Tunisie"]
+        .filter(Boolean)
+        .join(", ");
+      const hit = await forwardGeocode(query);
+      if (hit) {
+        setLocation(hit);
+        setMapFocus(hit);
+      }
+    }, 1100);
+    return () => clearTimeout(timer);
+  }, [address, city]);
 
   // ── Submit handler ──────────────────────────────────────────────────────────
 
@@ -272,9 +308,12 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           <LocationPicker
             value={location}
             onChange={setLocation}
-            onCity={(geocodedCity) => {
-              // Only auto-fill city if the user hasn't typed one yet
-              if (!city) setCity(geocodedCity);
+            focus={mapFocus}
+            onGeocode={(r) => {
+              // Fill ville + adresse from the pin; skip the echo geocode.
+              programmaticFillRef.current = true;
+              if (r.city) setCity(r.city);
+              if (r.address) setAddress(r.address);
             }}
           />
         </div>

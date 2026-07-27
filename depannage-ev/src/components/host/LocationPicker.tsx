@@ -2,8 +2,9 @@
 
 import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import { reverseGeocode, type LatLng, type ReverseResult } from "@/lib/geocode";
 
 // ── Brand pin (matches ChargerMap) ────────────────────────────────────────────
 
@@ -23,79 +24,73 @@ function makePin(color: string, size: number): L.DivIcon {
 
 const PIN = makePin("#0891b2", 28); // brand-600
 
-// ── Click-handler child ───────────────────────────────────────────────────────
+// ── Click handler: place pin + reverse-geocode ville/adresse ─────────────────
 
-interface ClickHandlerProps {
-  onChange: (v: { lat: number; lng: number }) => void;
-  onCity?: (city: string) => void;
-}
-
-function ClickHandler({ onChange, onCity }: ClickHandlerProps) {
+function ClickHandler({
+  onChange,
+  onGeocode,
+}: {
+  onChange: (v: LatLng) => void;
+  onGeocode?: (r: ReverseResult) => void;
+}) {
   useMapEvents({
     click(e) {
       const { lat, lng } = e.latlng;
       onChange({ lat, lng });
 
-      // Optional best-effort reverse geocode
-      if (onCity) {
-        void (async () => {
-          try {
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-              { headers: { "Accept-Language": "fr" } },
-            );
-            if (!res.ok) return;
-            const json = (await res.json()) as {
-              address?: {
-                city?: string;
-                town?: string;
-                village?: string;
-                county?: string;
-              };
-            };
-            const city =
-              json.address?.city ??
-              json.address?.town ??
-              json.address?.village ??
-              json.address?.county ??
-              "";
-            if (city) onCity(city);
-          } catch {
-            // Never throw — geocoding is best-effort
-          }
-        })();
+      if (onGeocode) {
+        void reverseGeocode(lat, lng).then((r) => {
+          if (r && (r.city || r.address)) onGeocode(r);
+        });
       }
     },
   });
   return null;
 }
 
+// ── Focus controller: flies to a target set by forward geocoding ──────────────
+
+function FocusController({ focus }: { focus: LatLng | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!focus) return;
+    map.flyTo([focus.lat, focus.lng], Math.max(map.getZoom(), 15), {
+      duration: 0.9,
+    });
+  }, [focus, map]);
+  return null;
+}
+
 // ── LocationPicker ────────────────────────────────────────────────────────────
 
 export interface LocationPickerProps {
-  value: { lat: number; lng: number } | null;
-  onChange: (v: { lat: number; lng: number }) => void;
-  onCity?: (city: string) => void;
+  value: LatLng | null;
+  onChange: (v: LatLng) => void;
+  /** Called after a map click with the reverse-geocoded ville + adresse. */
+  onGeocode?: (r: ReverseResult) => void;
+  /** When set (by forward geocoding), the map flies to this point. */
+  focus?: LatLng | null;
 }
 
-export function LocationPicker({ value, onChange, onCity }: LocationPickerProps) {
-  // Fix Leaflet's default icon paths broken by bundlers
-  useEffect(() => {
-    // No-op: we use custom divIcons so default icon fix is not needed
-  }, []);
-
+export function LocationPicker({
+  value,
+  onChange,
+  onGeocode,
+  focus = null,
+}: LocationPickerProps) {
   return (
     <div className="h-80 w-full overflow-hidden rounded-2xl border border-brand-100">
       <MapContainer
-        center={[34.0, 9.5]}
-        zoom={6}
+        center={value ? [value.lat, value.lng] : [34.0, 9.5]}
+        zoom={value ? 15 : 6}
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
-        <ClickHandler onChange={onChange} onCity={onCity} />
+        <ClickHandler onChange={onChange} onGeocode={onGeocode} />
+        <FocusController focus={focus} />
         {value && <Marker position={[value.lat, value.lng]} icon={PIN} />}
       </MapContainer>
     </div>
