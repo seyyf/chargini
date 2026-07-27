@@ -1,0 +1,12 @@
+# Netlify build configuration.
+# The Next.js app lives in the depannage-ev/ subfolder — without `base`,
+# Netlify builds from the repo root, finds nothing, and serves a 404.
+
+[build]
+  base = "depannage-ev"
+  command = "npm run build"
+  publish = ".next"
+
+# Next.js runtime (auto-detected by Netlify, pinned here for determinism).
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
