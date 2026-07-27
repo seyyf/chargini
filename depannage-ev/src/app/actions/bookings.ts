@@ -2,12 +2,61 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { calculateBookingTotal } from "@/lib/pricing";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type ActionResult = { error?: string; bookingId?: string };
 type SetActiveResult = { error?: string };
+
+// ── getBookedRanges ────────────────────────────────────────────────────────────
+
+/**
+ * Anonymized busy time-ranges (pending/confirmed) for one charger within a
+ * day window, so the booking widget can hide already-taken slots.
+ *
+ * Uses the admin client because RLS (correctly) hides other drivers' bookings;
+ * only start/end times are returned — never who booked.
+ */
+export async function getBookedRanges(
+  chargerId: string,
+  dayStartISO: string,
+  dayEndISO: string,
+): Promise<{ ranges: Array<{ start: string; end: string }> }> {
+  const dayStart = new Date(dayStartISO);
+  const dayEnd = new Date(dayEndISO);
+  if (
+    !chargerId ||
+    isNaN(dayStart.getTime()) ||
+    isNaN(dayEnd.getTime()) ||
+    dayEnd <= dayStart ||
+    dayEnd.getTime() - dayStart.getTime() > 48 * 3_600_000
+  ) {
+    return { ranges: [] };
+  }
+
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("bookings")
+    .select("start_time, end_time")
+    .eq("charger_id", chargerId)
+    .in("status", ["pending", "confirmed"])
+    .lt("start_time", dayEnd.toISOString())
+    .gt("end_time", dayStart.toISOString())
+    .limit(100);
+
+  if (error || !data) {
+    if (error) console.error("[getBookedRanges] error:", error);
+    return { ranges: [] };
+  }
+
+  return {
+    ranges: (data as Array<{ start_time: string; end_time: string }>).map(
+      (r) => ({ start: r.start_time, end: r.end_time }),
+    ),
+  };
+}
 
 // ── assertBookingHost (private) ────────────────────────────────────────────────
 
@@ -113,6 +162,10 @@ export async function createBooking(formData: FormData): Promise<ActionResult> {
 
   if (insertError || !inserted) {
     console.error("[createBooking] insert error:", insertError);
+    // 23P01 = exclusion_violation: another booking overlaps this slot.
+    if (insertError?.code === "23P01") {
+      return { error: "booking.slotTaken" };
+    }
     return { error: "booking.chooseSlot" };
   }
 

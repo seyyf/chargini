@@ -259,6 +259,8 @@
     "end": "Heure de fin",
     "chooseTime": "—",
     "noSlotsThatDay": "Aucune disponibilité ce jour-là.",
+    "allSlotsTaken": "Tous les créneaux de ce jour sont déjà réservés.",
+    "slotTaken": "Ce créneau vient d'être réservé par quelqu'un d'autre. Choisissez un autre horaire.",
     "total": "Total",
     "estimated": "Estimation",
     "notAvailable": "Ce créneau n'est pas dans les disponibilités de la borne.",

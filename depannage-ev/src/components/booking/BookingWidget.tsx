@@ -11,8 +11,14 @@ import {
   dayOfWeekOf,
   windowsForWeekday,
 } from "@/lib/bookings/availability";
+import {
+  busyRangesForDay,
+  filterStartSlots,
+  filterEndSlots,
+  type BusyRange,
+} from "@/lib/bookings/slots";
 import { calculateBookingTotal } from "@/lib/pricing";
-import { createBooking } from "@/app/actions/bookings";
+import { createBooking, getBookedRanges } from "@/app/actions/bookings";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -244,6 +250,35 @@ export function BookingWidget({
   const [endTime, setEndTime] = useState("");
   const [showModal, setShowModal] = useState(false);
 
+  // Already-booked (pending/confirmed) ranges for the selected day, fetched as
+  // anonymized times so taken slots can be hidden from the pickers.
+  const [busy, setBusy] = useState<BusyRange[]>([]);
+  const [busyLoading, setBusyLoading] = useState(false);
+
+  useEffect(() => {
+    if (viewer !== "driver" || !date) {
+      setBusy([]);
+      return;
+    }
+    let cancelled = false;
+    const dayStart = new Date(`${date}T00:00`);
+    const dayEnd = new Date(dayStart.getTime() + 24 * 3_600_000);
+    setBusyLoading(true);
+    getBookedRanges(charger.id, dayStart.toISOString(), dayEnd.toISOString())
+      .then((res) => {
+        if (!cancelled) setBusy(busyRangesForDay(res.ranges, dayStart));
+      })
+      .catch(() => {
+        if (!cancelled) setBusy([]);
+      })
+      .finally(() => {
+        if (!cancelled) setBusyLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [viewer, date, charger.id]);
+
   // ── Guest ──
   if (viewer === "guest") {
     return (
@@ -314,12 +349,20 @@ export function BookingWidget({
   const notAvailable = slotChosen && !valid;
   const isFree = charger.priceAmount === 0;
 
-  // 24-hour time-slot options derived from the selected day's availability.
+  // 24-hour time-slot options from the day's availability, minus booked slots.
   const weekday = date ? dayOfWeekOf(date) : null;
   const windows = weekday !== null ? windowsForWeekday(availability, weekday) : [];
-  const startTimes = startSlots(windows);
-  const endTimes = endSlots(windows, startTime);
-  const dayHasNoSlots = Boolean(date) && windows.length === 0;
+  const startTimes = filterStartSlots(startSlots(windows), busy);
+  const endTimes = filterEndSlots(endSlots(windows, startTime), startTime, busy);
+  const dayClosed = Boolean(date) && windows.length === 0;
+  const allSlotsTaken =
+    Boolean(date) && windows.length > 0 && !busyLoading && startTimes.length === 0;
+  // Guards a race: the chosen slot may get booked while busy data loads.
+  const slotStillFree =
+    !startTime || !endTime
+      ? true
+      : startTimes.includes(startTime) && endTimes.includes(endTime);
+  const canReserve = valid && slotStillFree && !busyLoading;
 
   return (
     <>
@@ -348,9 +391,13 @@ export function BookingWidget({
             />
           </div>
 
-          {dayHasNoSlots ? (
+          {dayClosed ? (
             <p className="rounded-xl bg-amber-50 px-3 py-2.5 text-sm text-amber-700">
               {t("noSlotsThatDay")}
+            </p>
+          ) : allSlotsTaken ? (
+            <p className="rounded-xl bg-amber-50 px-3 py-2.5 text-sm text-amber-700">
+              {t("allSlotsTaken")}
             </p>
           ) : (
             <div className="grid grid-cols-2 gap-3">
@@ -362,7 +409,7 @@ export function BookingWidget({
                 </label>
                 <select
                   value={startTime}
-                  disabled={!date}
+                  disabled={!date || busyLoading}
                   onChange={(e) => {
                     setStartTime(e.target.value);
                     setEndTime("");
@@ -428,7 +475,7 @@ export function BookingWidget({
 
         <button
           type="button"
-          disabled={!valid}
+          disabled={!canReserve}
           onClick={() => setShowModal(true)}
           className="mt-4 w-full cursor-pointer rounded-xl bg-ink px-5 py-3 font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-50"
         >
