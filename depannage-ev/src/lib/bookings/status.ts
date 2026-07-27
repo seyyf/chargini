@@ -9,13 +9,13 @@ export function statusBadgeClasses(status: string): string {
     case "pending":
       return "bg-amber-100 text-amber-800 ring-amber-200";
     case "confirmed":
-      return "bg-emerald-100 text-emerald-800 ring-emerald-200";
+      return "bg-charge-500/10 text-charge-600 ring-charge-500/20";
     case "completed":
-      return "bg-slate-100 text-slate-700 ring-slate-200";
+      return "bg-brand-50 text-brand-700 ring-brand-100";
     case "cancelled":
       return "bg-red-100 text-red-700 ring-red-200";
     default:
-      return "bg-slate-100 text-slate-700 ring-slate-200";
+      return "bg-brand-50 text-ink-soft ring-brand-100";
   }
 }
 

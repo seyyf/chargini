@@ -1,6 +1,11 @@
 export type ConnectorType = "type2" | "type1" | "ccs" | "chademo" | "schuko";
 export type PriceUnit = "kwh" | "hour";
 export type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled";
+export type NotificationType =
+  | "booking_requested"
+  | "booking_confirmed"
+  | "booking_cancelled"
+  | "booking_completed";
 
 export interface Profile {
   id: string;

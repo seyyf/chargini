@@ -9,14 +9,14 @@ export async function GET(request: Request) {
   const next = safeNextPath(searchParams.get("next"));
 
   if (oauthError) {
-    return NextResponse.redirect(`${origin}/fr/auth?error=auth`);
+    return NextResponse.redirect(`${origin}/auth?error=auth`);
   }
 
   if (code) {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      return NextResponse.redirect(`${origin}/fr/auth?error=auth`);
+      return NextResponse.redirect(`${origin}/auth?error=auth`);
     }
   }
 

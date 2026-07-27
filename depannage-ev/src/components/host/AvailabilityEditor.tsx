@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Plus, X } from "lucide-react";
 
 export interface AvailabilityRow {
   day_of_week: number;
@@ -41,11 +42,11 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
       {value.map((row, i) => (
         <div
           key={i}
-          className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
+          className="flex flex-wrap items-end gap-3 rounded-xl border border-brand-100 bg-surface/60 px-3 py-2"
         >
           {/* Day selector */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-slate-600">
+            <label className="text-xs font-medium text-ink-soft">
               {t("host.day")}
             </label>
             <select
@@ -53,7 +54,7 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
               onChange={(e) =>
                 updateRow(i, { day_of_week: Number(e.target.value) })
               }
-              className="rounded border border-slate-300 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="rounded-lg border border-brand-100 bg-white px-2 py-1 text-sm text-ink transition-colors focus:border-brand-400 focus:outline-none"
             >
               {DAY_KEYS.map((k) => (
                 <option key={k} value={k}>
@@ -65,27 +66,27 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
 
           {/* Start time */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-slate-600">
+            <label className="text-xs font-medium text-ink-soft">
               {t("host.startTime")}
             </label>
             <input
               type="time"
               value={row.start_time}
               onChange={(e) => updateRow(i, { start_time: e.target.value })}
-              className="rounded border border-slate-300 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="rounded-lg border border-brand-100 bg-white px-2 py-1 text-sm text-ink transition-colors focus:border-brand-400 focus:outline-none"
             />
           </div>
 
           {/* End time */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-slate-600">
+            <label className="text-xs font-medium text-ink-soft">
               {t("host.endTime")}
             </label>
             <input
               type="time"
               value={row.end_time}
               onChange={(e) => updateRow(i, { end_time: e.target.value })}
-              className="rounded border border-slate-300 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="rounded-lg border border-brand-100 bg-white px-2 py-1 text-sm text-ink transition-colors focus:border-brand-400 focus:outline-none"
             />
           </div>
 
@@ -93,8 +94,9 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
           <button
             type="button"
             onClick={() => removeRow(i)}
-            className="ml-auto self-end rounded px-3 py-1 text-sm text-red-600 hover:bg-red-50"
+            className="ml-auto inline-flex cursor-pointer items-center gap-1 self-end rounded-lg px-3 py-1 text-sm text-red-600 transition-colors hover:bg-red-50"
           >
+            <X className="h-4 w-4" />
             {t("host.remove")}
           </button>
         </div>
@@ -103,9 +105,10 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
       <button
         type="button"
         onClick={addRow}
-        className="rounded-lg border border-dashed border-emerald-400 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
+        className="inline-flex cursor-pointer items-center gap-1 rounded-xl border border-dashed border-brand-300 bg-brand-50 px-4 py-2 text-sm font-medium text-brand-700 transition-colors hover:bg-brand-100"
       >
-        + {t("host.addAvailability")}
+        <Plus className="h-4 w-4" />
+        {t("host.addAvailability")}
       </button>
     </div>
   );

@@ -44,6 +44,11 @@ describe("formatPrice", () => {
     // 1 TND/kWh — should show "1,000" not "1" or "1.000"
     expect(formatPrice(1, "kwh")).toBe("1,000 TND / kWh");
   });
+
+  it("shows 'Gratuit' when the price is zero (free charger)", () => {
+    expect(formatPrice(0, "kwh")).toBe("Gratuit");
+    expect(formatPrice(0, "hour")).toBe("Gratuit");
+  });
 });
 
 describe("formatPower", () => {

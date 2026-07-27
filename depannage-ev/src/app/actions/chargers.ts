@@ -48,6 +48,9 @@ function parseListingFormData(formData: FormData): ParsedFormData {
     (f) => f instanceof File && f.size > 0,
   );
 
+  // Free chargers store a price of 0; the price field is not required.
+  const isFree = str("isFree") === "true";
+
   const input: ListingInput = {
     title: str("title"),
     description: str("description"),
@@ -58,7 +61,8 @@ function parseListingFormData(formData: FormData): ParsedFormData {
     lat: num("lat"),
     lng: num("lng"),
     powerKw: num("powerKw"),
-    priceAmount: num("priceAmount"),
+    isFree,
+    priceAmount: isFree ? 0 : num("priceAmount"),
     availability,
   };
 

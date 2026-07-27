@@ -1,26 +1,214 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ *
+ * Chargini design system
+ * Electric-teal brand + energetic "charge" green, deep-teal ink.
+ * ------------------------------------------------------------------ */
+@theme {
+  /* Brand — electric teal / cyan */
+  --color-brand-50: #ecfeff;
+  --color-brand-100: #cffafe;
+  --color-brand-200: #a5f3fc;
+  --color-brand-300: #67e8f9;
+  --color-brand-400: #22d3ee;
+  --color-brand-500: #06b6d4;
+  --color-brand-600: #0891b2;
+  --color-brand-700: #0e7490;
+  --color-brand-800: #155e75;
+  --color-brand-900: #164e63;
+  --color-brand-950: #083344;
+
+  /* Accent — "charge" green */
+  --color-charge-300: #6ee7b7;
+  --color-charge-400: #34d399;
+  --color-charge-500: #10b981;
+  --color-charge-600: #059669;
+  --color-spark: #a3e635; /* lime highlight */
+
+  /* Ink — deep teal-navy text on light surfaces */
+  --color-ink: #06202b;
+  --color-ink-soft: #35525f;
+  --color-ink-faint: #6b8592;
+
+  /* Surfaces */
+  --color-surface: #f2fbfd;
+
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #f2fbfd;
+  --foreground: #06202b;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headings */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* ------------------------------------------------------------------ *
+ * Decorative utilities
+ * ------------------------------------------------------------------ */
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(100deg, #0891b2 0%, #06b6d4 40%, #10b981 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-bright {
+  background: linear-gradient(100deg, #67e8f9 0%, #34d399 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Frosted glass (light) */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Frosted glass over dark panels */
+.glass-dark {
+  background: rgba(6, 32, 43, 0.55);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Aurora mesh background (light hero) */
+.bg-mesh {
+  background-color: #f2fbfd;
+  background-image:
+    radial-gradient(48rem 40rem at 12% -8%, rgba(34, 211, 238, 0.28), transparent 60%),
+    radial-gradient(42rem 36rem at 92% 6%, rgba(16, 185, 129, 0.22), transparent 55%),
+    radial-gradient(38rem 40rem at 60% 108%, rgba(8, 145, 178, 0.18), transparent 55%);
+}
+
+/* Aurora mesh over deep-teal panels */
+.bg-mesh-dark {
+  background-color: #06202b;
+  background-image:
+    radial-gradient(46rem 38rem at 8% -6%, rgba(34, 211, 238, 0.35), transparent 58%),
+    radial-gradient(40rem 34rem at 100% 4%, rgba(16, 185, 129, 0.28), transparent 55%),
+    radial-gradient(36rem 40rem at 78% 118%, rgba(6, 182, 212, 0.24), transparent 55%);
+}
+
+/* Subtle dot grid */
+.bg-grid {
+  background-image: radial-gradient(rgba(8, 145, 178, 0.12) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Glow ring behind hero art */
+.glow {
+  box-shadow: 0 0 0 1px rgba(8, 145, 178, 0.08),
+    0 30px 80px -20px rgba(8, 145, 178, 0.45);
+}
+
+/* ------------------------------------------------------------------ *
+ * Animations
+ * ------------------------------------------------------------------ */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-22px) rotate(2deg); }
+}
+@keyframes gradient-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  70% { transform: scale(1.5); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 9s ease-in-out infinite; }
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-pan 8s ease infinite;
+}
+.animate-marquee { animation: marquee 32s linear infinite; }
+.pulse-ring {
+  animation: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+/* Shimmer sweep for buttons/cards */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  animation: shimmer 2.6s ease-in-out infinite;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-float,
+  .animate-float-slow,
+  .animate-gradient,
+  .animate-marquee,
+  .pulse-ring,
+  .shimmer::after {
+    animation: none !important;
+  }
+}
+
+/* Nicer focus ring, brand-tinted */
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Custom selection */
+::selection {
+  background: rgba(16, 185, 129, 0.24);
+  color: #06202b;
 }

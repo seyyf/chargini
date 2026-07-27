@@ -19,20 +19,20 @@ export async function IncomingBookingRow({ booking }: IncomingBookingRowProps) {
   const slot = `${slotFmt.format(new Date(booking.start_time))} – ${new Intl.DateTimeFormat("fr-FR", { timeStyle: "short" }).format(new Date(booking.end_time))}`;
 
   return (
-    <div className="rounded-lg border border-slate-100 bg-white px-4 py-3 shadow-sm space-y-2">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Driver name + charger link */}
+    <div className="rounded-2xl border border-brand-100 bg-white px-4 py-3 shadow-sm space-y-2">
+      {/* Whole info block is clickable (the action buttons below stay separate) */}
+      <Link
+        href={`/bookings/${booking.id}`}
+        className="-mx-1 flex flex-wrap items-center justify-between gap-3 rounded-xl px-1 py-1 transition-colors hover:bg-brand-50"
+      >
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-ink-soft">
             {booking.driver.full_name ?? "—"}
           </p>
-          <Link
-            href={`/bookings/${booking.id}`}
-            className="truncate text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
-          >
+          <p className="truncate text-sm font-semibold text-ink">
             {booking.charger.title}
-          </Link>
-          <p className="text-xs text-slate-500">{slot}</p>
+          </p>
+          <p className="text-xs text-ink-soft">{slot}</p>
         </div>
 
         {/* Status badge */}
@@ -41,7 +41,7 @@ export async function IncomingBookingRow({ booking }: IncomingBookingRowProps) {
         >
           {t(`booking.status.${booking.status}` as Parameters<typeof t>[0])}
         </span>
-      </div>
+      </Link>
 
       {/* Inline Accept / Decline for pending bookings */}
       {booking.status === "pending" && (

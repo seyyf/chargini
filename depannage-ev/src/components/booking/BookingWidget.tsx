@@ -2,9 +2,15 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { Loader2, Wallet, Info, Calendar, Clock } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import type { AvailabilityRule } from "@/types/database";
-import { isWithinAvailability, hasAnyAvailability } from "@/lib/bookings/availability";
+import {
+  isWithinAvailability,
+  hasAnyAvailability,
+  dayOfWeekOf,
+  windowsForWeekday,
+} from "@/lib/bookings/availability";
 import { calculateBookingTotal } from "@/lib/pricing";
 import { createBooking } from "@/app/actions/bookings";
 
@@ -25,6 +31,7 @@ interface BookingWidgetProps {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function formatTND(amount: number): string {
+  if (amount === 0) return "Gratuit";
   return (
     new Intl.NumberFormat("fr-FR", {
       minimumFractionDigits: 3,
@@ -37,32 +44,89 @@ function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-// ── CheckoutModal ──────────────────────────────────────────────────────────────
+// ── 24-hour time slots (Tunisia uses a 24h clock — no AM/PM) ────────────────────
 
-interface CheckoutModalProps {
+const SLOT_STEP = 30; // minutes
+
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function toHHMM(mins: number): string {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+type Window = { start_time: string; end_time: string };
+
+/** Valid start times (30-min steps) inside the day's availability windows. */
+function startSlots(windows: Window[]): string[] {
+  const set = new Set<string>();
+  for (const w of windows) {
+    const end = toMinutes(w.end_time);
+    for (let t = toMinutes(w.start_time); t <= end - SLOT_STEP; t += SLOT_STEP) {
+      set.add(toHHMM(t));
+    }
+  }
+  return [...set].sort();
+}
+
+/** Valid end times after `start`, within the same window. */
+function endSlots(windows: Window[], start: string): string[] {
+  if (!start) return [];
+  const s = toMinutes(start);
+  const w = windows.find(
+    (win) => toMinutes(win.start_time) <= s && s < toMinutes(win.end_time),
+  );
+  if (!w) return [];
+  const out: string[] = [];
+  for (let t = s + SLOT_STEP; t <= toMinutes(w.end_time); t += SLOT_STEP) {
+    out.push(toHHMM(t));
+  }
+  return out;
+}
+
+/** "mercredi 30 juillet" for a "YYYY-MM-DD" string. */
+function formatFrDate(dateISO: string): string {
+  const [y, m, d] = dateISO.split("-").map(Number);
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(y, m - 1, d));
+}
+
+// ── ReserveConfirmModal ─────────────────────────────────────────────────────────
+// No online payment: a reservation is a request. Payment is settled in person
+// (hand to hand) with the host at the charger.
+
+interface ReserveConfirmModalProps {
   charger: BookingWidgetProps["charger"];
   date: string;
   startTime: string;
   endTime: string;
   formattedTotal: string;
+  isFree: boolean;
   onClose: () => void;
   onSuccess: (bookingId: string) => void;
 }
 
-function CheckoutModal({
+function ReserveConfirmModal({
   charger,
   date,
   startTime,
   endTime,
   formattedTotal,
+  isFree,
   onClose,
   onSuccess,
-}: CheckoutModalProps) {
+}: ReserveConfirmModalProps) {
   const t = useTranslations("booking");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  // Close on ESC key
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -71,7 +135,7 @@ function CheckoutModal({
     return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  function handlePay() {
+  function handleConfirm() {
     setError(null);
     startTransition(async () => {
       const fd = new FormData();
@@ -84,7 +148,6 @@ function CheckoutModal({
       if (result.bookingId) {
         onSuccess(result.bookingId);
       } else if (result.error) {
-        // Errors are like "booking.loginToBook" — strip the namespace prefix
         const key = result.error.startsWith("booking.")
           ? result.error.replace("booking.", "")
           : result.error;
@@ -98,113 +161,67 @@ function CheckoutModal({
   }
 
   return (
-    /* Backdrop */
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       role="dialog"
       aria-modal="true"
-      aria-label={t("checkoutTitle")}
+      aria-label={t("confirmTitle")}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      {/* Modal card */}
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-        <h2 className="mb-1 text-lg font-bold text-slate-900">
-          {t("checkoutTitle")}
+      <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-white p-6 shadow-2xl">
+        <h2 className="mb-1 font-display text-lg font-bold text-ink">
+          {t("confirmTitle")}
         </h2>
 
-        {/* Booking summary */}
-        <p className="mb-5 text-sm text-slate-600">
-          {charger.title} &mdash; {date} {startTime}&ndash;{endTime} &mdash;{" "}
-          <span className="font-semibold text-slate-900">{formattedTotal}</span>
+        {/* Summary */}
+        <p className="mb-4 text-sm text-ink-soft">
+          {charger.title} &mdash; {date} {startTime}&ndash;{endTime}
         </p>
 
-        {/* Fake card inputs */}
-        <div className="space-y-3">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              {t("cardName")}
-            </label>
-            <input
-              type="text"
-              autoComplete="cc-name"
-              placeholder="Jean Dupont"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              {t("cardNumber")}
-            </label>
-            <input
-              type="text"
-              autoComplete="cc-number"
-              placeholder="4242 4242 4242 4242"
-              maxLength={19}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">
-                {t("expiry")}
-              </label>
-              <input
-                type="text"
-                autoComplete="cc-exp"
-                placeholder="MM/AA"
-                maxLength={5}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">
-                {t("cvc")}
-              </label>
-              <input
-                type="text"
-                autoComplete="cc-csc"
-                placeholder="123"
-                maxLength={4}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-              />
-            </div>
-          </div>
+        {/* Amount to pay in person */}
+        <div className="flex items-center justify-between rounded-xl border border-brand-100 bg-surface/60 px-4 py-3">
+          <span className="inline-flex items-center gap-2 text-sm font-medium text-ink-soft">
+            <Wallet className="h-4 w-4 text-brand-600" />
+            {isFree ? t("free") : t("toPay")}
+          </span>
+          <span className="font-display text-base font-bold text-brand-700">
+            {formattedTotal}
+          </span>
         </div>
 
-        {/* Mock notice */}
-        <p className="mt-3 text-xs text-slate-400">{t("mockNotice")}</p>
+        {/* Hand-to-hand payment note */}
+        {!isFree && (
+          <p className="mt-3 flex items-start gap-2 rounded-lg bg-brand-50 px-3 py-2 text-xs text-ink-soft">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
+            {t("handPayment")}
+          </p>
+        )}
 
-        {/* Error */}
         {error && (
           <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600">
             {error}
           </p>
         )}
 
-        {/* Actions */}
         <div className="mt-5 flex gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-60"
+            className="flex-1 cursor-pointer rounded-xl border border-brand-200 px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {t("cancel")}
           </button>
-
           <button
             type="button"
-            onClick={handlePay}
+            onClick={handleConfirm}
             disabled={isPending}
-            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isPending
-              ? t("processing")
-              : t("payNow", { amount: formattedTotal })}
+            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isPending ? t("processing") : t("confirmReserve")}
           </button>
         </div>
       </div>
@@ -230,13 +247,13 @@ export function BookingWidget({
   // ── Guest ──
   if (viewer === "guest") {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 font-display text-base font-semibold text-ink">
           {t("widgetTitle")}
         </h2>
         <Link
           href="/auth"
-          className="block w-full rounded-lg bg-emerald-600 px-5 py-3 text-center font-semibold text-white transition-colors hover:bg-emerald-700"
+          className="block w-full cursor-pointer rounded-xl bg-ink px-5 py-3 text-center font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25"
         >
           {t("loginToBook")}
         </Link>
@@ -247,11 +264,11 @@ export function BookingWidget({
   // ── Host ──
   if (viewer === "host") {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-2 text-base font-semibold text-slate-900">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-2 font-display text-base font-semibold text-ink">
           {t("widgetTitle")}
         </h2>
-        <p className="text-sm text-slate-500">{t("ownCharger")}</p>
+        <p className="text-sm text-ink-soft">{t("ownCharger")}</p>
       </div>
     );
   }
@@ -260,11 +277,11 @@ export function BookingWidget({
 
   if (!hasAnyAvailability(availability)) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-2 text-base font-semibold text-slate-900">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-2 font-display text-base font-semibold text-ink">
           {t("widgetTitle")}
         </h2>
-        <p className="text-sm text-slate-500">{t("noAvailability")}</p>
+        <p className="text-sm text-ink-soft">{t("noAvailability")}</p>
       </div>
     );
   }
@@ -295,90 +312,138 @@ export function BookingWidget({
 
   const slotChosen = Boolean(date && startTime && endTime);
   const notAvailable = slotChosen && !valid;
+  const isFree = charger.priceAmount === 0;
+
+  // 24-hour time-slot options derived from the selected day's availability.
+  const weekday = date ? dayOfWeekOf(date) : null;
+  const windows = weekday !== null ? windowsForWeekday(availability, weekday) : [];
+  const startTimes = startSlots(windows);
+  const endTimes = endSlots(windows, startTime);
+  const dayHasNoSlots = Boolean(date) && windows.length === 0;
 
   return (
     <>
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 font-display text-base font-semibold text-ink">
           {t("widgetTitle")}
         </h2>
 
         <div className="space-y-3">
           {/* Date */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
+            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+              <Calendar className="h-3.5 w-3.5 text-brand-600" />
               {t("date")}
             </label>
             <input
               type="date"
               value={date}
               min={todayISO()}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              onChange={(e) => {
+                setDate(e.target.value);
+                setStartTime("");
+                setEndTime("");
+              }}
+              className="w-full cursor-pointer rounded-xl border border-brand-100 bg-surface/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-brand-400 focus:bg-white"
             />
           </div>
 
-          {/* Start time */}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              {t("start")}
-            </label>
-            <input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
+          {dayHasNoSlots ? (
+            <p className="rounded-xl bg-amber-50 px-3 py-2.5 text-sm text-amber-700">
+              {t("noSlotsThatDay")}
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {/* Start (24h) */}
+              <div>
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+                  <Clock className="h-3.5 w-3.5 text-brand-600" />
+                  {t("start")}
+                </label>
+                <select
+                  value={startTime}
+                  disabled={!date}
+                  onChange={(e) => {
+                    setStartTime(e.target.value);
+                    setEndTime("");
+                  }}
+                  className="w-full cursor-pointer rounded-xl border border-brand-100 bg-surface/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-brand-400 focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">{t("chooseTime")}</option>
+                  {startTimes.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* End time */}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              {t("end")}
-            </label>
-            <input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
+              {/* End (24h) */}
+              <div>
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+                  <Clock className="h-3.5 w-3.5 text-brand-600" />
+                  {t("end")}
+                </label>
+                <select
+                  value={endTime}
+                  disabled={!startTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-full cursor-pointer rounded-xl border border-brand-100 bg-surface/60 px-3 py-2.5 text-sm text-ink outline-none focus:border-brand-400 focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">{t("chooseTime")}</option>
+                  {endTimes.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Not-available message */}
+        {/* Selected slot summary (24h, French date) */}
+        {valid && (
+          <div className="mt-3 rounded-xl border border-brand-100 bg-brand-50/50 px-3 py-2.5 text-sm text-ink">
+            <span className="font-medium capitalize">{formatFrDate(date)}</span>{" "}
+            · {startTime} – {endTime}
+          </div>
+        )}
+
         {notAvailable && (
           <p className="mt-3 text-sm font-medium text-red-600">
             {t("notAvailable")}
           </p>
         )}
 
-        {/* Total */}
         {valid && total !== null && (
-          <p className="mt-3 text-sm text-slate-700">
+          <p className="mt-3 text-sm text-ink-soft">
             <span className="font-medium">{t("total")} :</span>{" "}
-            <span className="font-bold text-emerald-700">{formattedTotal}</span>
+            <span className="font-bold text-brand-700">{formattedTotal}</span>
           </p>
         )}
 
-        {/* Reserve button */}
+        {/* Hand-to-hand note under the widget */}
+        <p className="mt-3 text-xs text-ink-faint">{t("handPaymentShort")}</p>
+
         <button
           type="button"
           disabled={!valid}
           onClick={() => setShowModal(true)}
-          className="mt-4 w-full rounded-lg bg-emerald-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-4 w-full cursor-pointer rounded-xl bg-ink px-5 py-3 font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("reserve")}
         </button>
       </div>
 
-      {/* Checkout modal */}
       {showModal && (
-        <CheckoutModal
+        <ReserveConfirmModal
           charger={charger}
           date={date}
           startTime={startTime}
           endTime={endTime}
           formattedTotal={formattedTotal}
+          isFree={isFree}
           onClose={() => setShowModal(false)}
           onSuccess={(bookingId) => {
             setShowModal(false);

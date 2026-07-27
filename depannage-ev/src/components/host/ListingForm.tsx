@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { validateListing, type ListingErrors } from "@/lib/chargers/listingValidation";
 import { createCharger, updateCharger } from "@/app/actions/chargers";
@@ -43,10 +44,23 @@ const PRICE_UNITS = ["kwh", "hour"] as const;
 
 // ── Field component helpers ───────────────────────────────────────────────────
 
-function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
+function FieldLabel({
+  htmlFor,
+  required,
+  children,
+}: {
+  htmlFor: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-700">
+    <label htmlFor={htmlFor} className="block text-sm font-medium text-ink-soft">
       {children}
+      {required && (
+        <span className="ml-0.5 text-red-500" aria-hidden="true">
+          *
+        </span>
+      )}
     </label>
   );
 }
@@ -75,7 +89,13 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
   );
   const [connectorType, setConnectorType] = useState(initial.connectorType ?? "type2");
   const [powerKw, setPowerKw] = useState(initial.powerKw?.toString() ?? "");
-  const [priceAmount, setPriceAmount] = useState(initial.priceAmount?.toString() ?? "");
+  // A stored price of 0 means the charger was published as free.
+  const [isFree, setIsFree] = useState(initial.priceAmount === 0);
+  const [priceAmount, setPriceAmount] = useState(
+    initial.priceAmount && initial.priceAmount > 0
+      ? initial.priceAmount.toString()
+      : "",
+  );
   const [priceUnit, setPriceUnit] = useState(initial.priceUnit ?? "kwh");
   const [photos, setPhotos] = useState<File[]>([]);
   const [availability, setAvailability] = useState<AvailabilityRow[]>(
@@ -104,7 +124,12 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
       lng: location?.lng ?? null,
       connectorType,
       powerKw: isNaN(parsedPower as number) ? null : parsedPower,
-      priceAmount: isNaN(parsedPrice as number) ? null : parsedPrice,
+      isFree,
+      priceAmount: isFree
+        ? 0
+        : isNaN(parsedPrice as number)
+          ? null
+          : parsedPrice,
       priceUnit,
       availability,
     };
@@ -129,7 +154,8 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
     }
     fd.append("connectorType", connectorType);
     fd.append("powerKw", powerKw);
-    fd.append("priceAmount", priceAmount);
+    fd.append("isFree", String(isFree));
+    fd.append("priceAmount", isFree ? "0" : priceAmount);
     fd.append("priceUnit", priceUnit);
     fd.append("availability", JSON.stringify(availability));
     photos.forEach((file) => fd.append("photos", file));
@@ -165,23 +191,30 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-6">
+      {/* Required-fields legend */}
+      <p className="text-xs text-ink-faint">
+        <span className="text-red-500">*</span> {t("host.requiredNote")}
+      </p>
+
       {/* Server-level error */}
       {serverError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {serverError}
         </div>
       )}
 
       {/* Title */}
       <div>
-        <FieldLabel htmlFor="title">{t("host.fields.title")}</FieldLabel>
+        <FieldLabel htmlFor="title" required>
+          {t("host.fields.title")}
+        </FieldLabel>
         <input
           id="title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           maxLength={120}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("title")} />
       </div>
@@ -194,41 +227,47 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("description")} />
       </div>
 
       {/* Address */}
       <div>
-        <FieldLabel htmlFor="address">{t("host.fields.address")}</FieldLabel>
+        <FieldLabel htmlFor="address" required>
+          {t("host.fields.address")}
+        </FieldLabel>
         <input
           id="address"
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("address")} />
       </div>
 
       {/* City — auto-filled by reverse geocode but still editable */}
       <div>
-        <FieldLabel htmlFor="city">{t("host.fields.city")}</FieldLabel>
+        <FieldLabel htmlFor="city" required>
+          {t("host.fields.city")}
+        </FieldLabel>
         <input
           id="city"
           type="text"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("city")} />
       </div>
 
       {/* Map location picker */}
       <div>
-        <FieldLabel htmlFor="location-map">{t("host.fields.location")}</FieldLabel>
-        <p className="mb-2 text-xs text-slate-500">{t("host.locationHint")}</p>
+        <FieldLabel htmlFor="location-map" required>
+          {t("host.fields.location")}
+        </FieldLabel>
+        <p className="mb-2 text-xs text-ink-faint">{t("host.locationHint")}</p>
         <div id="location-map">
           <LocationPicker
             value={location}
@@ -244,12 +283,14 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
 
       {/* Connector type */}
       <div>
-        <FieldLabel htmlFor="connectorType">{t("host.fields.connector")}</FieldLabel>
+        <FieldLabel htmlFor="connectorType" required>
+          {t("host.fields.connector")}
+        </FieldLabel>
         <select
           id="connectorType"
           value={connectorType}
           onChange={(e) => setConnectorType(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         >
           {CONNECTOR_TYPES.map((ct) => (
             <option key={ct} value={ct}>
@@ -262,7 +303,9 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
 
       {/* Power (kW) */}
       <div>
-        <FieldLabel htmlFor="powerKw">{t("host.fields.power")}</FieldLabel>
+        <FieldLabel htmlFor="powerKw" required>
+          {t("host.fields.power")}
+        </FieldLabel>
         <input
           id="powerKw"
           type="number"
@@ -271,40 +314,64 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
           step={0.1}
           value={powerKw}
           onChange={(e) => setPowerKw(e.target.value)}
-          className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="mt-1 block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
         />
         <FieldError message={fe("powerKw")} />
       </div>
 
-      {/* Price amount + unit */}
+      {/* Free-electricity option */}
       <div>
-        <FieldLabel htmlFor="priceAmount">{t("host.fields.price")}</FieldLabel>
-        <div className="mt-1 flex gap-2">
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-brand-100 bg-surface/60 p-3 transition-colors hover:bg-brand-50">
           <input
-            id="priceAmount"
-            type="number"
-            min={0.01}
-            step={0.01}
-            value={priceAmount}
-            onChange={(e) => setPriceAmount(e.target.value)}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            type="checkbox"
+            checked={isFree}
+            onChange={(e) => setIsFree(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-brand-300 text-brand-600 focus:ring-brand-500"
           />
-          <select
-            id="priceUnit"
-            value={priceUnit}
-            onChange={(e) => setPriceUnit(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          >
-            {PRICE_UNITS.map((u) => (
-              <option key={u} value={u}>
-                {t(u === "kwh" ? "host.fields.perKwh" : "host.fields.perHour")}
-              </option>
-            ))}
-          </select>
-        </div>
-        <FieldError message={fe("priceAmount")} />
-        <FieldError message={fe("priceUnit")} />
+          <span>
+            <span className="block text-sm font-medium text-ink">
+              {t("host.fields.free")}
+            </span>
+            <span className="block text-xs text-ink-faint">
+              {t("host.fields.freeHint")}
+            </span>
+          </span>
+        </label>
       </div>
+
+      {/* Price amount + unit — hidden when the charger is offered for free */}
+      {!isFree && (
+        <div>
+          <FieldLabel htmlFor="priceAmount" required>
+            {t("host.fields.price")}
+          </FieldLabel>
+          <div className="mt-1 flex gap-2">
+            <input
+              id="priceAmount"
+              type="number"
+              min={0.01}
+              step={0.01}
+              value={priceAmount}
+              onChange={(e) => setPriceAmount(e.target.value)}
+              className="block w-full rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
+            />
+            <select
+              id="priceUnit"
+              value={priceUnit}
+              onChange={(e) => setPriceUnit(e.target.value)}
+              className="rounded-xl border border-brand-100 bg-surface/60 px-3 py-2 text-sm text-ink transition-colors focus:border-brand-400 focus:bg-white focus:outline-none"
+            >
+              {PRICE_UNITS.map((u) => (
+                <option key={u} value={u}>
+                  {t(u === "kwh" ? "host.fields.perKwh" : "host.fields.perHour")}
+                </option>
+              ))}
+            </select>
+          </div>
+          <FieldError message={fe("priceAmount")} />
+          <FieldError message={fe("priceUnit")} />
+        </div>
+      )}
 
       {/* Photos */}
       <div>
@@ -328,8 +395,9 @@ export function ListingForm({ mode, chargerId, initial = {} }: ListingFormProps)
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 disabled:cursor-not-allowed disabled:opacity-60"
         >
+          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           {isPending
             ? t("host.submitting")
             : mode === "new"

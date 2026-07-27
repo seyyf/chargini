@@ -15,26 +15,55 @@ export type ChargerDetail = Charger & {
   reviews: Array<Review & { reviewer: Pick<Profile, "id" | "full_name" | "avatar_url"> }>;
 };
 
+/** A charger plus its host's aggregate rating (reviews are about the host). */
+export type ChargerListItem = Charger & {
+  ratingAvg: number;
+  ratingCount: number;
+};
+
 /**
- * Returns all active chargers ordered by newest first.
- * On any database error logs it and returns an empty array so callers can
- * render gracefully without crashing.
+ * Returns all active chargers (newest first) with each host's rating stitched
+ * in, so listing cards can show stars. On any DB error logs it and returns an
+ * empty array so callers can render gracefully.
  */
-export async function getActiveChargers(): Promise<Charger[]> {
+export async function getActiveChargers(): Promise<ChargerListItem[]> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
     .from("chargers")
     .select(CHARGER_COLUMNS)
     .eq("is_active", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    // Safety cap: the list renders in pages of 12 and the map plots these pins.
+    // Beyond this scale, move filtering + pagination server-side (URL params).
+    .limit(500);
 
   if (error) {
     console.error("[getActiveChargers] Supabase error:", error);
     return [];
   }
 
-  return (data ?? []) as Charger[];
+  const chargers = (data ?? []) as Charger[];
+  if (chargers.length === 0) return [];
+
+  // Fetch each host's rating in one query and stitch it in.
+  const hostIds = [...new Set(chargers.map((c) => c.host_id))];
+  const { data: hosts } = await supabase
+    .from("profiles")
+    .select("id, rating_avg, rating_count")
+    .in("id", hostIds);
+
+  const ratings = new Map(
+    (hosts ?? []).map((h) => [
+      h.id as string,
+      { avg: Number(h.rating_avg) || 0, count: Number(h.rating_count) || 0 },
+    ]),
+  );
+
+  return chargers.map((c) => {
+    const r = ratings.get(c.host_id);
+    return { ...c, ratingAvg: r?.avg ?? 0, ratingCount: r?.count ?? 0 };
+  });
 }
 
 /**

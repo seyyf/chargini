@@ -1,11 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { Charger } from "@/types/database";
+import type { ChargerListItem } from "@/lib/chargers/queries";
 import { ChargerCard } from "./ChargerCard";
 
 interface ChargerListProps {
-  chargers: Charger[];
+  chargers: ChargerListItem[];
   /** Currently selected charger id (synced with map). */
   selectedId?: string | null;
 }
@@ -15,7 +15,7 @@ export function ChargerList({ chargers, selectedId }: ChargerListProps) {
 
   if (chargers.length === 0) {
     return (
-      <p className="py-16 text-center text-slate-500">{t("empty")}</p>
+      <p className="py-16 text-center text-ink-soft">{t("empty")}</p>
     );
   }
 
