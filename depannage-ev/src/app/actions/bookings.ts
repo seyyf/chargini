@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { calculateBookingTotal } from "@/lib/pricing";
+import { sendBookingEmail } from "@/lib/email/notify";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -169,7 +170,9 @@ export async function createBooking(formData: FormData): Promise<ActionResult> {
     return { error: "booking.chooseSlot" };
   }
 
-  return { bookingId: (inserted as { id: string }).id };
+  const bookingId = (inserted as { id: string }).id;
+  await sendBookingEmail(bookingId, "requested");
+  return { bookingId };
 }
 
 // ── acceptBooking ──────────────────────────────────────────────────────────────
@@ -196,6 +199,7 @@ export async function acceptBooking(id: string): Promise<ActionResult> {
     return { error: "bookingPage.notAllowed" };
   }
 
+  await sendBookingEmail(id, "confirmed");
   revalidatePath("/dashboard");
   return { bookingId: id };
 }
@@ -224,6 +228,7 @@ export async function declineBooking(id: string): Promise<ActionResult> {
     return { error: "bookingPage.notAllowed" };
   }
 
+  await sendBookingEmail(id, "declined");
   revalidatePath("/dashboard");
   return { bookingId: id };
 }
@@ -252,6 +257,7 @@ export async function completeBooking(id: string): Promise<ActionResult> {
     return { error: "bookingPage.notAllowed" };
   }
 
+  await sendBookingEmail(id, "completed");
   revalidatePath("/dashboard");
   return { bookingId: id };
 }
@@ -290,6 +296,7 @@ export async function cancelBooking(id: string): Promise<ActionResult> {
     return { error: "bookingPage.notAllowed" };
   }
 
+  await sendBookingEmail(id, "cancelled");
   revalidatePath("/dashboard");
   return { bookingId: id };
 }
