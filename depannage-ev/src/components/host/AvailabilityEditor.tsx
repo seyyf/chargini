@@ -22,6 +22,22 @@ const DEFAULT_ROW: AvailabilityRow = {
 
 const DAY_KEYS = ["0", "1", "2", "3", "4", "5", "6"] as const;
 
+// 24-hour half-hour steps: 00:00 … 23:30 (Tunisia uses a 24h clock).
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
+  const h = Math.floor(i / 2);
+  const m = i % 2 === 0 ? "00" : "30";
+  return `${String(h).padStart(2, "0")}:${m}`;
+});
+
+/** Normalizes "HH:MM:SS" → "HH:MM" and keeps off-grid values selectable. */
+function hhmm(v: string): string {
+  return v.slice(0, 5);
+}
+
+function optionsWith(current: string, all: string[]): string[] {
+  return all.includes(current) ? all : [current, ...all].sort();
+}
+
 export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps) {
   const t = useTranslations();
 
@@ -64,30 +80,53 @@ export function AvailabilityEditor({ value, onChange }: AvailabilityEditorProps)
             </select>
           </div>
 
-          {/* Start time */}
+          {/* Start time (24h) */}
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-ink-soft">
               {t("host.startTime")}
             </label>
-            <input
-              type="time"
-              value={row.start_time}
-              onChange={(e) => updateRow(i, { start_time: e.target.value })}
-              className="rounded-lg border border-brand-100 bg-white px-2 py-1 text-sm text-ink transition-colors focus:border-brand-400 focus:outline-none"
-            />
+            <select
+              value={hhmm(row.start_time)}
+              onChange={(e) => {
+                const start = e.target.value;
+                // Keep the window valid: end must stay after start.
+                const end =
+                  hhmm(row.end_time) > start
+                    ? row.end_time
+                    : TIME_OPTIONS.find((o) => o > start) ?? "23:30";
+                updateRow(i, { start_time: start, end_time: end });
+              }}
+              className="cursor-pointer rounded-lg border border-brand-100 bg-white px-2 py-1 text-sm text-ink transition-colors focus:border-brand-400 focus:outline-none"
+            >
+              {optionsWith(hhmm(row.start_time), TIME_OPTIONS.slice(0, -1)).map(
+                (o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ),
+              )}
+            </select>
           </div>
 
-          {/* End time */}
+          {/* End time (24h, after the start) */}
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-ink-soft">
               {t("host.endTime")}
             </label>
-            <input
-              type="time"
-              value={row.end_time}
+            <select
+              value={hhmm(row.end_time)}
               onChange={(e) => updateRow(i, { end_time: e.target.value })}
-              className="rounded-lg border border-brand-100 bg-white px-2 py-1 text-sm text-ink transition-colors focus:border-brand-400 focus:outline-none"
-            />
+              className="cursor-pointer rounded-lg border border-brand-100 bg-white px-2 py-1 text-sm text-ink transition-colors focus:border-brand-400 focus:outline-none"
+            >
+              {optionsWith(
+                hhmm(row.end_time),
+                TIME_OPTIONS.filter((o) => o > hhmm(row.start_time)),
+              ).map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Remove */}
